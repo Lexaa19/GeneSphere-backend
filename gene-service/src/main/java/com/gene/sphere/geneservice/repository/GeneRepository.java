@@ -30,18 +30,37 @@ public interface GeneRepository extends JpaRepository<Gene,Integer> {
     List<Gene> findByName(String name);
 
     /**
-     * Finds a single gene whose name contains the given fragment, ignoring case.
+     * Finds a single gene whose name matches exactly, ignoring case.
+     * This is safer than "containing" for unique lookups.
+     *
+     * @param name the exact gene name to match (case-insensitive)
+     * @return an {@link Optional} containing the matching gene if found
+     */
+    Optional<Gene> findByNameIgnoreCase(String name);
+
+    /**
+     * Finds all genes whose name contains the given fragment, ignoring case.
      * <p>
-     * Note: Because the query can match multiple rows, declaring a single-result
-     * return type means Spring Data will throw an
-     * {@link org.springframework.dao.IncorrectResultSizeDataAccessException}
-     * if more than one result is found. If you expect multiple matches, consider
-     * using a {@code List<Gene>} return type instead (e.g.,
-     * {@code List<Gene> findAllByNameContainingIgnoreCase(String partOfName)}).
+     * This method returns a list to handle multiple matches properly.
+     * Use this for search functionality where multiple results are expected.
      * </p>
      *
      * @param partOfName a substring to search within gene names (case-insensitive)
-     * @return an {@link Optional} containing the matching gene if exactly one is found; {@link Optional#empty()} if none
+     * @return a list of genes containing the substring (possibly empty)
      */
+    List<Gene> findAllByNameContainingIgnoreCase(String partOfName);
+
+    /**
+     * Finds the first gene whose name contains the given fragment, ignoring case.
+     * <p>
+     * This method is deprecated and may cause issues if multiple genes match.
+     * Use findByNameIgnoreCase for exact matches or findAllByNameContainingIgnoreCase for searches.
+     * </p>
+     *
+     * @deprecated Use findByNameIgnoreCase for exact matches
+     * @param partOfName a substring to search within gene names (case-insensitive)
+     * @return an {@link Optional} containing the first matching gene if found
+     */
+    @Deprecated
     Optional<Gene> findByNameContainingIgnoreCase(String partOfName);
 }
