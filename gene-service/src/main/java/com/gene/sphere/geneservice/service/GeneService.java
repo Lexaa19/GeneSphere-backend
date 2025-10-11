@@ -25,13 +25,13 @@ public class GeneService implements GeneServiceInterface {
     }
 
     /**
-     * Get gene by name (case insensitive).
+     * Get gene by name (case insensitive exact match).
      *
-     * @param name gene symbol
+     * @param name gene symbol (exact match)
      * @return API DTO wrapped in Optional
      */
     public Optional<GeneRecord> getGeneByName(String name) {
-        return geneRepository.findByNameContainingIgnoreCase(name).map(factory::toDto);
+        return geneRepository.findByNameIgnoreCase(name).map(factory::toDto);
     }
 
     /**
@@ -69,5 +69,19 @@ public class GeneService implements GeneServiceInterface {
      */
     public void deleteGene(Integer id) {
         geneRepository.deleteById(id);
+    }
+
+    /**
+     * Search for genes containing the given substring (case insensitive).
+     * Use this for search functionality where multiple results are expected.
+     *
+     * @param partOfName substring to search for in gene names
+     * @return list of matching genes
+     */
+    public List<GeneRecord> searchGenesByName(String partOfName) {
+        return geneRepository.findAllByNameContainingIgnoreCase(partOfName)
+                .stream()
+                .map(factory::toDto)
+                .toList();
     }
 }
