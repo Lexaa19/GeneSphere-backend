@@ -4,6 +4,7 @@ import com.gene.sphere.geneservice.model.Gene;
 import com.gene.sphere.geneservice.model.GeneRecord;
 import com.gene.sphere.geneservice.service.GeneServiceInterface;
 import com.gene.sphere.geneservice.service.GeneDataIngestionService;
+import com.gene.sphere.geneservice.cache.RedisCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
@@ -33,10 +34,14 @@ public class GeneController {
     @Autowired
     private GeneDataIngestionService geneDataIngestionService;
 
+    @Autowired
+    private RedisCacheService cacheService;
+
     /**
      * Retrieves a {@link Gene} by its unique name.
      * <p>
      * Example request: GET /genes/{name}
+     * This endpoint now uses Redis caching for improved performance!
      *
      * @param name the unique gene name to look up (e.g., "TP53")
      * @return a {@link ResponseEntity} containing:
@@ -47,7 +52,7 @@ public class GeneController {
      */
     @GetMapping("/{name}")
     public ResponseEntity<GeneRecord> getGene(@PathVariable String name) {
-        return geneService.getGeneByName(name)
+        return cacheService.getGeneByName(name)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -100,6 +105,37 @@ public class GeneController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body("❌ Failed to populate genes: " + e.getMessage());
+        }
+    }
+
+    // ===== REDIS CACHE TESTING ENDPOINTS =====
+
+    /**
+     * Clears all cached genes from Redis.
+     * Useful for testing cache behavior.
+     */
+    @DeleteMapping("/cache/clear")
+    public ResponseEntity<String> clearCache() {
+        try {
+            cacheService.clearCache();
+            return ResponseEntity.ok("✅ Redis cache cleared successfully");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body("❌ Failed to clear cache: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Evicts a specific gene from the Redis cache.
+     */
+    @DeleteMapping("/cache/{name}")
+    public ResponseEntity<String> evictGeneFromCache(@PathVariable String name) {
+        try {
+            cacheService.evictGene(name);
+            return ResponseEntity.ok("✅ Gene '" + name + "' evicted from cache");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body("❌ Failed to evict gene from cache: " + e.getMessage());
         }
     }
 
