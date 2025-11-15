@@ -40,32 +40,7 @@ public class RedisConfig {
      */
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        GenericObjectPoolConfig<?> poolConfig = new GenericObjectPoolConfig<>();
-        // If all 20 connections are busy, the new requests must wait.
-        poolConfig.setMaxTotal(20); 
-        // Max 10 connections that are ready to go instantly       
-        poolConfig.setMaxIdle(10); 
-        // Maintain at least 5 available connections ready for immediate use       
-        poolConfig.setMinIdle(5);     
-        // If all the 20 connections are busy, user needs to wait for 3 seconds maximum. After that, throw an error instead of waiting forever     
-        poolConfig.setMaxWaitMillis(3000); 
-        // Test the connection before giving it to your application
-        poolConfig.setTestOnBorrow(true); 
-        // Test connection when app returns it to the pool 
-        poolConfig.setTestOnReturn(true); 
-        // Test the idle connections periodically 
-        poolConfig.setTestWhileIdle(true); 
-
-        // Run cleanup process every 60 seconds 
-        poolConfig.setTimeBetweenEvictionRunsMillis(60000); 
-        // During each clean up, test 3 connections
-        poolConfig.setNumTestsPerEvictionRun(3); 
-        // When all the connections are busy, make the user wait instead of failing
-        poolConfig.setBlockWhenExhausted(true); 
-        // Remove the connections that have been idle for more than 5 minutes
-        poolConfig.setMinEvictableIdleTimeMillis(300000); 
-        // Remove 3+ minute idle connections only when pool is full 
-        poolConfig.setSoftMinEvictableIdleTimeMillis(180000);
+        GenericObjectPoolConfig<?> poolConfig = getGenericObjectPoolConfig();
 
         // Client configuration with timeouts
         LettuceClientConfiguration clientConfig = LettucePoolingClientConfiguration.builder()
@@ -89,6 +64,36 @@ public class RedisConfig {
         }
 
         return new LettuceConnectionFactory(serverConfig, clientConfig);
+    }
+
+    private static GenericObjectPoolConfig<?> getGenericObjectPoolConfig() {
+        GenericObjectPoolConfig<?> poolConfig = new GenericObjectPoolConfig<>();
+        // If all 20 connections are busy, the new requests must wait.
+        poolConfig.setMaxTotal(20);
+        // Max 10 connections that are ready to go instantly
+        poolConfig.setMaxIdle(10);
+        // Maintain at least 5 available connections ready for immediate use
+        poolConfig.setMinIdle(5);
+        // If all the 20 connections are busy, user needs to wait for 3 seconds maximum. After that, throw an error instead of waiting forever
+        poolConfig.setMaxWaitMillis(3000);
+        // Test the connection before giving it to your application
+        poolConfig.setTestOnBorrow(true);
+        // Test connection when app returns it to the pool
+        poolConfig.setTestOnReturn(true);
+        // Test the idle connections periodically
+        poolConfig.setTestWhileIdle(true);
+
+        // Run cleanup process every 60 seconds
+        poolConfig.setTimeBetweenEvictionRunsMillis(60000);
+        // During each clean up, test 3 connections
+        poolConfig.setNumTestsPerEvictionRun(3);
+        // When all the connections are busy, make the user wait instead of failing
+        poolConfig.setBlockWhenExhausted(true);
+        // Remove the connections that have been idle for more than 5 minutes
+        poolConfig.setMinEvictableIdleTimeMillis(300000);
+        // Remove 3+ minute idle connections only when pool is full
+        poolConfig.setSoftMinEvictableIdleTimeMillis(180000);
+        return poolConfig;
     }
 
     /**
