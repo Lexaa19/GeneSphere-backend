@@ -26,8 +26,6 @@ package com.gene.sphere.geneservice.cache;
  * @param timestamp    Unix timestamp (milliseconds) when the clear operation was executed
  * @param pattern      the Redis key pattern that was used for the clear operation (optional)
  *
- * @author Gene Sphere Development Team
- * @since 1.0.0
  * @see com.gene.sphere.geneservice.cache.RedisCacheService
  * @see com.gene.sphere.geneservice.cache.CacheStatus
  */
@@ -38,6 +36,25 @@ public record ClearResult(
         long timestamp,
         String pattern
 ) {
+    
+    /**
+     * Compact constructor that validates fundamental invariants.
+     * This ensures all ClearResult instances are valid, regardless of how they're created.
+     */
+    public ClearResult {
+        if (pattern == null || pattern.isBlank()) {
+            throw new IllegalArgumentException("Pattern cannot be null or blank");
+        }
+        if (deletedCount < 0) {
+            throw new IllegalArgumentException("Deleted count cannot be negative: " + deletedCount);
+        }
+        if (message == null || message.isBlank()) {
+            throw new IllegalArgumentException("Message cannot be null or blank");
+        }
+        if (timestamp <= 0) {
+            throw new IllegalArgumentException("Timestamp must be positive: " + timestamp);
+        }
+    }
 
     /**
      * Creates a successful clear result with the specified deletion count and pattern.
@@ -57,16 +74,9 @@ public record ClearResult(
      * @param deletedCount the number of cache entries that were successfully deleted, must be >= 0
      * @param pattern      the Redis key pattern used for the operation, must not be null
      * @return a new ClearResult indicating successful operation
-     * @throws IllegalArgumentException if deletedCount is negative or pattern is null
+     * @throws IllegalArgumentException if deletedCount is negative or pattern is null (via compact constructor)
      */
     public static ClearResult success(long deletedCount, String pattern) {
-        if (deletedCount < 0) {
-            throw new IllegalArgumentException("Deleted count cannot be negative");
-        }
-        if (pattern == null) {
-            throw new IllegalArgumentException("Pattern cannot be null");
-        }
-
         String message = deletedCount == 0
                 ? String.format("No cache entries found matching pattern '%s'", pattern)
                 : String.format("Successfully cleared %d cache entries matching pattern '%s'", deletedCount, pattern);
@@ -78,18 +88,11 @@ public record ClearResult(
      * Creates a failed clear result with error information.
      *
      * @param pattern the Redis key pattern that was attempted, must not be null
-     * @param errorMessage the error message describing what went wrong
+     * @param errorMessage the error message describing what went wrong, must not be null
      * @return a new ClearResult indicating failed operation
-     * @throws IllegalArgumentException if pattern or errorMessage is null
+     * @throws IllegalArgumentException if pattern or errorMessage is null (via compact constructor)
      */
     public static ClearResult failure(String pattern, String errorMessage) {
-        if (pattern == null) {
-            throw new IllegalArgumentException("Pattern cannot be null");
-        }
-        if (errorMessage == null) {
-            throw new IllegalArgumentException("Error message cannot be null");
-        }
-
         String message = String.format("Failed to clear cache entries for pattern '%s': %s",
                 pattern, errorMessage);
         return new ClearResult(false, 0L, message, System.currentTimeMillis(), pattern);

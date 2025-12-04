@@ -15,12 +15,8 @@ package com.gene.sphere.geneservice.cache;
  * @param geneKeys     the number of gene-related cache entries (keys matching "gene:*")
  * @param mutationKeys the number of mutation-related cache entries (keys matching "mutation:*")
  * @param timestamp    the Unix timestamp (milliseconds) when these statistics were collected
- * @param status       the current cache availability status ("AVAILABLE", "UNAVAILABLE", "DEGRADED")
- *
- * @author Gene Sphere Development Team
- * @since 1.0.0
- * @see com.gene.sphere.geneservice.cache.RedisCacheService
- * @see com.gene.sphere.geneservice.config.RedisHealthIndicator
+ * @param status       the current cache availability status ("AVAILABLE", "UNAVAILABLE")
+ * 
  */
 public record CacheStatus(
         Long totalKeys,
