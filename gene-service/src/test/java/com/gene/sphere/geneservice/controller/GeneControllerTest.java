@@ -19,12 +19,12 @@ import java.util.Optional;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(GeneController.class)
 class GeneControllerTest {
-
+    // MockMvc allows you to test your Spring MVC controllers without starting a real server.
+    // It simulates HTTP requests and checks responses, status codes, headers, and content.
     @Autowired
     private MockMvc mock;
 

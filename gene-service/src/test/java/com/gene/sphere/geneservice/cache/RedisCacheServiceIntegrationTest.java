@@ -1,61 +1,100 @@
 package com.gene.sphere.geneservice.cache;
 
-import com.gene.sphere.geneservice.config.TestRedisConfig;
 import com.gene.sphere.geneservice.model.GeneRecord;
 import com.gene.sphere.geneservice.service.GeneService;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Testcontainers
+@ActiveProfiles("test")
 class RedisCacheServiceIntegrationTest {
 
     @Container
     static GenericContainer<?> redis = new GenericContainer<>("redis:7-alpine")
-            .withExposedPorts(6379);
+            .withExposedPorts(6379)
+            .waitingFor(Wait.forLogMessage(".*Ready to accept connections.*\\n", 1))
+            .withStartupTimeout(Duration.ofMinutes(2));
+
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private RedisCacheService cacheService;
+
     @MockBean
     private GeneService geneService;
-    private RedisCacheService cacheService;
+
+    @MockBean
+    private RedissonClient redissonClient;
+
+    @MockBean
+    private RLock rLock;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.redis.host", redis::getHost);
+        registry.add("spring.redis.port", redis::getFirstMappedPort);
         registry.add("spring.data.redis.host", redis::getHost);
         registry.add("spring.data.redis.port", redis::getFirstMappedPort);
+        registry.add("spring.redis.timeout", () -> "5000ms");
+        registry.add("spring.data.redis.timeout", () -> "5000ms");
+        registry.add("spring.redis.lettuce.shutdown-timeout", () -> "200ms");
+    }
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        @Primary
+        MeterRegistry meterRegistry() {
+            return new SimpleMeterRegistry();
+        }
     }
 
     @BeforeEach
-    void setUp() {
-        // Clean Redis before each test
-        redisTemplate.getConnectionFactory().getConnection().flushAll();
+    void setUp() throws Exception {
+        try {
+            redisTemplate.getConnectionFactory().getConnection().flushAll();
+        } catch (Exception e) {
+            // Ignore connection errors in setup
+        }
+        reset(geneService, redissonClient, rLock);
 
-        // Create cache service with real Redis
-        cacheService = new RedisCacheService(redisTemplate, geneService, null);
+        // Mock Redisson lock behavior - always allow lock acquisition
+        when(redissonClient.getLock(anyString())).thenReturn(rLock);
+        when(rLock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).thenReturn(true);
+        doNothing().when(rLock).unlock();
     }
 
     @Test
     void testRealRedisCache_ShouldCacheAndRetrieveGene() {
-        // Given - Cache some data first
-        var geneName = "TP53";
-        var geneRecord = new GeneRecord(
+        String geneName = "TP53";
+        GeneRecord geneRecord = new GeneRecord(
                 "TP53",
                 "Tumor protein p53",
                 "Cell cycle control",
@@ -67,31 +106,25 @@ class RedisCacheServiceIntegrationTest {
 
         when(geneService.getGeneByName(geneName)).thenReturn(Optional.of(geneRecord));
 
-        // When - First call (cache miss)
         var firstCall = cacheService.getGeneByName(geneName);
-
-        // Then - Should get gene and cache it
         assertTrue(firstCall.isPresent());
         assertEquals(geneRecord, firstCall.get());
 
-        // When - Second call (should be cache hit)
         var secondCall = cacheService.getGeneByName(geneName);
-
-        // Then - Should get cached gene without calling service again
         assertTrue(secondCall.isPresent());
         assertEquals(geneRecord, secondCall.get());
 
-        // Verify data is actually in Redis
-        var cachedValue = redisTemplate.opsForValue().get("gene:TP53");
+        verify(geneService, times(1)).getGeneByName(geneName);
+
+        Object cachedValue = redisTemplate.opsForValue().get("gene:TP53");
         assertNotNull(cachedValue);
         assertInstanceOf(GeneRecord.class, cachedValue);
     }
 
     @Test
     void testRealRedisEviction_ShouldRemoveSpecificGene() {
-        // Given - Cache some data first
-        var geneName = "TP53";
-        var geneRecord = new GeneRecord(
+        String geneName = "TP53";
+        GeneRecord geneRecord = new GeneRecord(
                 "TP53",
                 "Tumor protein p53",
                 "Cell cycle control",
@@ -105,24 +138,25 @@ class RedisCacheServiceIntegrationTest {
 
         cacheService.getGeneByName(geneName);
 
-        // Verify the gene is cached
-        var beforeEviction = redisTemplate.opsForValue().get("gene:TP53");
+        Object beforeEviction = redisTemplate.opsForValue().get("gene:TP53");
         assertNotNull(beforeEviction);
 
-        // When - Evict the gene
         cacheService.evictGene(geneName);
 
-        // Then - Should be removed from Redis
-        var afterEviction = redisTemplate.opsForValue().get("gene:TP53");
+        Object afterEviction = redisTemplate.opsForValue().get("gene:TP53");
         assertNull(afterEviction);
+
+        var callAfterEviction = cacheService.getGeneByName(geneName);
+        assertTrue(callAfterEviction.isPresent());
+        verify(geneService, times(2)).getGeneByName(geneName);
     }
 
     @Test
     void testRealRedisClearCache_ShouldRemoveAllGenes() {
-        var genes = new String[]{"BRCA1", "TP53", "EGFR"};
+        String[] genes = {"BRCA1", "TP53", "EGFR"};
 
-        for (var gene : genes) {
-            var record = new GeneRecord(
+        for (String gene : genes) {
+            GeneRecord record = new GeneRecord(
                     gene,
                     "Description for " + gene,
                     "Normal function",
@@ -132,29 +166,31 @@ class RedisCacheServiceIntegrationTest {
                     "https://example.com/" + gene
             );
             when(geneService.getGeneByName(gene)).thenReturn(Optional.of(record));
-            cacheService.getGeneByName(gene); // Cache each gene
+            cacheService.getGeneByName(gene);
         }
 
-        // Verify all the genes are cached
-        for (var gene : genes) {
-            var cached = redisTemplate.opsForValue().get("gene:" + gene);
-            assertNotNull(cached, "Gene " + gene + " should be cached");
+        for (String gene : genes) {
+            assertNotNull(redisTemplate.opsForValue().get("gene:" + gene));
         }
 
-        // When - Clear cache
         cacheService.clearCache();
 
-        for (var gene : genes) {
-            var cached = redisTemplate.opsForValue().get("gene: " + gene);
-            assertNull(cached, "Gene " + gene + " should be evicted");
+        for (String gene : genes) {
+            assertNull(redisTemplate.opsForValue().get("gene:" + gene));
         }
+
+        for (String gene : genes) {
+            cacheService.getGeneByName(gene);
+        }
+        verify(geneService, times(2)).getGeneByName("BRCA1");
+        verify(geneService, times(2)).getGeneByName("TP53");
+        verify(geneService, times(2)).getGeneByName("EGFR");
     }
 
     @Test
-    void testRedisTTL_ShouldExpireAfterConfiguredTime() throws InterruptedException {
-        // Given - Gene with short TTL for testing
-        var geneName = "SHORT_TTL";
-        var geneRecord = new GeneRecord(
+    void testRedisTTL_ShouldExpireAfterConfiguredTime() {
+        String geneName = "SHORT_TTL";
+        GeneRecord geneRecord = new GeneRecord(
                 "SHORT_TTL",
                 "Gene with short TTL",
                 "Test function",
@@ -166,16 +202,28 @@ class RedisCacheServiceIntegrationTest {
 
         when(geneService.getGeneByName(geneName)).thenReturn(Optional.of(geneRecord));
 
-        // When - Cache gene
         cacheService.getGeneByName(geneName);
 
-        // Then - Should be cached immediately
-        var immediateCheck = redisTemplate.opsForValue().get("gene:SHORT_TTL");
+        Object immediateCheck = redisTemplate.opsForValue().get("gene:SHORT_TTL");
         assertNotNull(immediateCheck);
 
-        var ttl = redisTemplate.getExpire("gene:SHORT_TTL");
-        assertTrue(ttl > Duration.ofDays(4).getSeconds(), "TTL should be set to approximately 5 days");
+        Long ttl = redisTemplate.getExpire("gene:SHORT_TTL");
+        assertNotNull(ttl);
+        assertTrue(ttl > Duration.ofDays(4).getSeconds(), "TTL should be ~5 days");
+    }
 
-        System.out.println("TTL for cached gene: " + ttl + " seconds");
+    @Test
+    void testCacheMiss_ShouldReturnEmptyWhenGeneNotFound() {
+        String geneName = "NONEXISTENT";
+        when(geneService.getGeneByName(geneName)).thenReturn(Optional.empty());
+
+        var result = cacheService.getGeneByName(geneName);
+        assertFalse(result.isPresent());
+
+        verify(geneService, times(1)).getGeneByName(geneName);
+
+        var secondResult = cacheService.getGeneByName(geneName);
+        assertFalse(secondResult.isPresent());
+        verify(geneService, times(2)).getGeneByName(geneName);
     }
 }

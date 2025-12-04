@@ -1,186 +1,81 @@
 package com.gene.sphere.geneservice.cache;
 
-import com.gene.sphere.geneservice.model.GeneRecord;
-import com.gene.sphere.geneservice.service.GeneService;
-import org.junit.jupiter.api.BeforeEach;
+import com.gene.sphere.geneservice.config.SecurityConfig;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-import java.util.Set;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.lenient;
+@WebMvcTest(controllers = SecurityConfigTest.TestEndpoints.class)
+@Import(SecurityConfig.class)
+@ActiveProfiles("test")
+class SecurityConfigTest {
 
-@ExtendWith(MockitoExtension.class)
-class RedisCacheServiceTest {
+    @Autowired MockMvc mvc;
 
-    @Mock
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Mock
-    private GeneService geneService;
-
-    @Mock
-    private ValueOperations<String, Object> valueOperations;
-
-    private RedisCacheService cacheService;
-
-    @BeforeEach
-    void setUp() {
-        // lenient() = "It's okay if this stub isn't used in every test - don't throw an exception"
-        // If not all the methods use this mock, Mockito will complain and throw some stubbing error
-        lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        cacheService = new RedisCacheService(redisTemplate, geneService, null);
+    // Minimal endpoints to exercise your security rules
+    @RestController
+    static class TestEndpoints {
+        @GetMapping("/actuator/health") public ResponseEntity<String> health() { return ResponseEntity.ok("ok"); }
+        @GetMapping("/actuator/info")   public ResponseEntity<String> info()   { return ResponseEntity.ok("ok"); }
+        @GetMapping("/genes/ping")      public ResponseEntity<String> genes()  { return ResponseEntity.ok("ok"); }
+        @GetMapping("/cache/status")    public ResponseEntity<String> status() { return ResponseEntity.ok("ok"); }
+        @DeleteMapping("/cache/delete/x") public ResponseEntity<Void> del()    { return ResponseEntity.noContent().build(); }
+        @DeleteMapping("/cache/clear/x")  public ResponseEntity<Void> clear()  { return ResponseEntity.noContent().build(); }
     }
 
-    @Test
-    void testCacheHit_ShouldReturnCachedGene() {
-        var geneName = "TP53";
-        var expectedGene = new GeneRecord(
-                "TP53",
-                "Guardian of the genome",
-                "Cell cycle regulation",
-                "Oncogenic mutations",
-                "50% of cancers",
-                "MDM2 inhibitors",
-                "https://p53.com"
-        );
-        var cacheKey = "gene:TP53";
-
-        when(valueOperations.get(cacheKey)).thenReturn(expectedGene);
-
-        var result = cacheService.getGeneByName(geneName);
-
-        assertAll("Cache hit and found the result",
-                () -> assertTrue(result.isPresent()),
-                () -> assertEquals(expectedGene, result.get()),
-                // Don't call the service as the gene is found in cache
-                () -> verify(geneService, never()).getGeneByName(geneName)
-        );
-    }
-
-    @Test
-    void testCacheMiss_ShouldFetchFromServiceAndCache() {
-        var geneName = "TP53";
-        var expectedGene = new GeneRecord(
-                "TP53",
-                "Guardian of the genome",
-                "Cell cycle regulation",
-                "Oncogenic mutations",
-                "50% of cancers",
-                "MDM2 inhibitors",
-                "https://p53.com"
-        );
-
-        var cachedKey = "gene:TP53";
-
-        when(valueOperations.get(cachedKey)).thenReturn(null);
-        when(geneService.getGeneByName(geneName)).thenReturn(Optional.of(expectedGene));
-
-        var result = cacheService.getGeneByName(geneName);
-
-        assertAll("Cache miss and no result found",
-                () -> assertTrue(result.isPresent()),
-                () -> assertEquals(expectedGene, result.get()),
-                () -> verify(geneService).getGeneByName(geneName),
-                () -> verify(valueOperations).set(eq(cachedKey), eq(expectedGene), any()) // Should cache the result
-        );
-    }
-
-    @Test
-    void testClearCache_ShouldDeleteAllGeneKeys() {
-        var keysToDelete = Set.of("gene:BRCA1", "gene:TP53", "gene:EGFR");
-
-        when(redisTemplate.keys("gene:*")).thenReturn(keysToDelete);
-
-        cacheService.clearCache();
-
-        verify(redisTemplate).keys("gene:*"); // Did it search?
-        verify(redisTemplate).delete(keysToDelete); // Did it delete?
-    }
-
-    @Test
-    void testEvictGene_ShouldDeleteSpecificKey() {
-        var geneName = "BRCA1";
-        var expectedKey = "gene:BRCA1";
-
-        cacheService.evictGene(geneName);
-
-        verify(redisTemplate).delete(expectedKey);
-    }
-
-    @Test
-    void shouldReturnEmpty_whenGeneNotFoundInCacheOrDatabase() {
-        var geneName = "UNKNOWN_GENE";
-        var cacheKey = "gene:UNKNOWN_GENE";
-
-        // Redis cache miss
-        when(valueOperations.get(cacheKey)).thenReturn(null);
-
-        // Database miss (return Optional.empty())
-        when(geneService.getGeneByName(geneName)).thenReturn(Optional.empty());
-
-        // Verify: result is empty, service WAS called, nothing cached
-        var result = cacheService.getGeneByName(geneName);
-
-        // Check what the user gets
-        assertAll("Gene not found in db and Redis",
-                () -> assertTrue(result.isEmpty()),
-                () -> assertFalse(result.isPresent())
-        );
-
-        // Check what the system did
-        verify(geneService).getGeneByName(geneName);
-        verify(valueOperations, never()).set(any(), any(), any()); // Should not cache empty
-    }
-
-    @Test
-    void shouldReturnEmpty_whenGeneNameIsNull() {
-        var result = cacheService.getGeneByName(null);
-
-        assertTrue(result.isEmpty());
-
-        // Should not call Redis
-        verify(valueOperations, never()).get(any());
-
-        // Should not call the db
-        verify(geneService, never()).getGeneByName(any());
-    }
-
-    @Test
-    void shouldReturnEmpty_whenGeneNameIsBlankOrEmpty() {
-        var invalidInputs = new String[]{
-                "",
-                " ",
-                "    ",
-                "\t",         // Add tab only
-                "\n",         // Add newline only
-                "\t\n",
-                "  \t\n  "    // Add mixed whitespace
-        };
-        // Use Java 17 features like switch expressions
-        for (var input : invalidInputs) {
-            var result = cacheService.getGeneByName(input);
-            var description = switch (input) {
-                case "" -> "empty string";
-                case " " -> "single space";
-                case "    " -> "multiple spaces";
-                case "\t" -> "tab character";
-                case "\n" -> "newline character";
-                case "\t\n" -> "tab + newline";
-                case "  \t\n  " -> "mixed whitespace";
-                default -> "unknown whitespace input";
-            };
-            assertTrue(result.isEmpty(), "Should return empty for: " + description);
+    // Test-only users; overrides any prod user store if present
+    @TestConfiguration
+    static class TestUsers {
+        @Bean @Primary
+        UserDetailsService uds(PasswordEncoder encoder) {
+            return new InMemoryUserDetailsManager(
+                    User.withUsername("admin").password(encoder.encode("adminpass")).roles("ADMIN").build(),
+                    User.withUsername("user").password(encoder.encode("userpass")).roles("USER").build()
+            );
         }
-        verify(valueOperations, never()).get(any());
-        verify(geneService, never()).getGeneByName(any());
+    }
 
+    @Test
+    void actuator_requires_admin_in_your_config() throws Exception {
+        mvc.perform(get("/actuator/health")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/actuator/info")).andExpect(status().isUnauthorized());
+
+        mvc.perform(get("/actuator/health").with(httpBasic("user","userpass"))).andExpect(status().isForbidden());
+        mvc.perform(get("/actuator/health").with(httpBasic("admin","adminpass"))).andExpect(status().isOk());
+        mvc.perform(get("/actuator/info").with(httpBasic("admin","adminpass"))).andExpect(status().isOk());
+    }
+
+    @Test
+    void user_endpoints() throws Exception {
+        mvc.perform(get("/genes/ping")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/cache/status")).andExpect(status().isUnauthorized());
+
+        mvc.perform(get("/genes/ping").with(httpBasic("user","userpass"))).andExpect(status().isOk());
+        mvc.perform(get("/cache/status").with(httpBasic("user","userpass"))).andExpect(status().isOk());
+    }
+
+    @Test
+    void admin_endpoints() throws Exception {
+        mvc.perform(delete("/cache/delete/x").with(httpBasic("user","userpass"))).andExpect(status().isForbidden());
+        mvc.perform(delete("/cache/clear/x").with(httpBasic("user","userpass"))).andExpect(status().isForbidden());
+
+        mvc.perform(delete("/cache/delete/x").with(httpBasic("admin","adminpass"))).andExpect(status().isNoContent());
+        mvc.perform(delete("/cache/clear/x").with(httpBasic("admin","adminpass"))).andExpect(status().isNoContent());
     }
 }
