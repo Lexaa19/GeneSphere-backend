@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -39,6 +40,7 @@ public class CacheController {
      * @return CacheStatus object with availability info.
      */
     @GetMapping("/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CacheStatus> getCacheStatus() {
         try {
             var cacheStatus = cacheService.getStatus();
@@ -55,6 +57,7 @@ public class CacheController {
      * @return ClearResult with details of the operation.
      */
     @DeleteMapping("/clear")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ClearResult> clearGenes(@RequestParam(required = false) String pattern) {
         try {
             if (pattern != null && !pattern.startsWith("gene:")) {
@@ -79,6 +82,7 @@ public class CacheController {
      * @return ClearResult with details of the operation.
      */
     @DeleteMapping("/clear/{geneName}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ClearResult> clearGene(@PathVariable String geneName) {
         try {
             if (geneName == null || geneName.trim().isEmpty()) {
@@ -122,6 +126,7 @@ public class CacheController {
      * @return Map with health status and details.
      */
     @GetMapping("/health")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> healthCheck() {
         try {
             Health health = redisHealthIndicator.health();
