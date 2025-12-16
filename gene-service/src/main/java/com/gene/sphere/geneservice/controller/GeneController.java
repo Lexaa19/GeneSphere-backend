@@ -1,12 +1,12 @@
 package com.gene.sphere.geneservice.controller;
 
 import com.gene.sphere.geneservice.cache.RedisCacheService;
-import com.gene.sphere.geneservice.service.GeneService;
 import com.gene.sphere.geneservice.model.GeneRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -51,6 +51,7 @@ public class GeneController {
      * Check if gene is in cache WITHOUT querying database
      */
     @GetMapping("/{name}/cached")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> isGeneCached(@PathVariable String name) {
         try {
             boolean inCache = cacheService.isGeneInCache(name);
@@ -67,6 +68,7 @@ public class GeneController {
      * Force refresh - bypass cache and fetch from database
      */
     @GetMapping("/{name}/refresh")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GeneRecord> refreshGene(@PathVariable String name) {
         logger.info("Force refreshing gene from database: {}", name);
 
@@ -90,6 +92,7 @@ public class GeneController {
     }
 
     @DeleteMapping("/cache/clear")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> clearAllGenesCached() {
         cacheService.clearByPattern("gene:*");
         return ResponseEntity.ok("All genes cleared from cache");
