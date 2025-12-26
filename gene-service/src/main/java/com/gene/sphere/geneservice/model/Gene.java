@@ -26,38 +26,43 @@ public class Gene {
     /**
      * Gene symbol/name (e.g., "TP53", "EGFR").
      */
-    @Column(nullable=false, unique=true)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     /**
      * Human-readable description or summary of the gene.
      */
-    @Column(length=2000)
+    @Column(name = "description", length = 2000)
     private String description;
 
     /**
      * The normal biological function/role of the gene.
      */
+    @Column(name = "normal_function", length = 1000)
     private String normalFunction;
 
     /**
      * Known or typical effects of pathogenic variants/mutations in this gene.
      */
+    @Column(name = "mutation_effect", length = 1000)
     private String mutationEffect;
 
     /**
      * Shows how common is a gene mutation in lung cancer
      */
+    @Column(name = "prevalence", length = 500)
     private String prevalence;
 
     /**
      * Relevant or approved therapies (e.g., targeted drugs) associated with this gene/mutations.
      */
+    @Column(name = "therapies", length = 500)
     private String therapies;
 
     /**
      * References or URLs to research articles, databases, or guidelines.
      */
+    @Column(name = "research_links", length = 500)
     private String researchLinks;
 
 }
