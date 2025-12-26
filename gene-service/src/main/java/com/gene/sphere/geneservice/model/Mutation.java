@@ -2,6 +2,8 @@ package com.gene.sphere.geneservice.model;
 
 import lombok.Data;
 import javax.persistence.*;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
 
 /**
@@ -10,7 +12,10 @@ import java.math.BigDecimal;
  */
 @Data
 @Entity
-@Table(name = "mutations")
+@Table(name = "mutations", indexes = {
+    @Index(name = "idx_mutations_chr_pos", columnList = "chromosome,position"),
+    @Index(name = "idx_mutations_patient", columnList = "patient_id")
+})
 public class Mutation {
 
     @Id
@@ -23,13 +28,6 @@ public class Mutation {
      */
     @Column(name = "gene_name", nullable = false, length = 50)
     private String geneName;
-
-    /**
-     * Alternative gene symbol (usually same as geneName).
-     * Kept for compatibility with different data sources.
-     */
-    @Column(name = "gene_symbol", length = 50)
-    private String geneSymbol;
 
     /**
      * Chromosome where the mutation is located.
@@ -112,5 +110,7 @@ public class Mutation {
      * NULL if not available from sequencing data.
      */
     @Column(name = "allele_frequency", precision = 5, scale = 4)
+    @DecimalMin(value = "0.0", message = "Allele frequency must be between 0.0 and 1.0")
+    @DecimalMax(value = "1.0", message = "Allele frequency must be between 0.0 and 1.0")
     private BigDecimal alleleFrequency;
 }
