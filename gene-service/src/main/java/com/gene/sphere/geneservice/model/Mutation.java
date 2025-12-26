@@ -15,7 +15,7 @@ public class Mutation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     /**
      * Gene name (HGNC symbol) where the mutation occurs.
