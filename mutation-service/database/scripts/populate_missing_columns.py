@@ -50,17 +50,28 @@ def generate_update_statements(input_file):
         header = f.readline().strip().split('\t')
         
         # Find column indices
-        try:
-            hugo_idx = header.index('Hugo_Symbol')
-            chr_idx = header.index('Chromosome')
-            start_idx = header.index('Start_Position')
-            ref_idx = header.index('Reference_Allele')
-            tumor_allele_idx = header.index('Tumor_Seq_Allele2')
-            sample_idx = header.index('Tumor_Sample_Barcode')
-            protein_idx = header.index('HGVSp_Short')
-        except ValueError as e:
-            print(f"-- ERROR: Missing required column: {e}", file=sys.stderr)
+        required_columns = [
+            'Hugo_Symbol',
+            'Chromosome',
+            'Start_Position',
+            'Reference_Allele',
+            'Tumor_Seq_Allele2',
+            'Tumor_Sample_Barcode',
+            'HGVSp_Short',
+        ]
+        missing_columns = [col for col in required_columns if col not in header]
+        if missing_columns:
+            missing_str = ", ".join(missing_columns)
+            print(f"-- ERROR: Missing required column(s): {missing_str}", file=sys.stderr)
             sys.exit(1)
+
+        hugo_idx = header.index('Hugo_Symbol')
+        chr_idx = header.index('Chromosome')
+        start_idx = header.index('Start_Position')
+        ref_idx = header.index('Reference_Allele')
+        tumor_allele_idx = header.index('Tumor_Seq_Allele2')
+        sample_idx = header.index('Tumor_Sample_Barcode')
+        protein_idx = header.index('HGVSp_Short')
         
         print(f"-- Found columns: Hugo_Symbol, Chromosome, Start_Position, Reference_Allele, Tumor_Seq_Allele2")
         print(f"-- Target columns: HGVSp_Short (protein_change), Tumor_Sample_Barcode (sample_id)")
