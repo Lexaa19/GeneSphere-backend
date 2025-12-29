@@ -129,7 +129,7 @@ public interface MutationRepository extends JpaRepository<Mutation, Integer> {
     List<Mutation> findByGeneNameIn(List<String> geneNames);
 
     /**
-     * Finds distinct patient IDs with mutations in a gene.
+     * Finds distinct sample IDs with mutations in a gene.
      * @param geneName gene symbol
      * @return list of unique sample IDs
      */

@@ -3,8 +3,28 @@
 Populate missing protein_change and sample_id columns in the mutations table.
 Matches existing records by gene_name, chromosome, position, and alleles.
 
+This script generates SQL UPDATE statements from cBioPortal TCGA data.
+It reads the data_mutations.txt file (TSV format) and creates UPDATE statements
+that can be executed via psql or pgAdmin.
+
+⚠️  SECURITY NOTE: This script uses string formatting for SQL generation, which
+is acceptable for generating static SQL files from trusted data sources (TCGA/cBioPortal).
+The output should be reviewed before execution. For runtime database updates with
+untrusted input, use parameterized queries (psycopg2, SQLAlchemy) instead.
+
+RECOMMENDED APPROACH: Use bulk_update_missing_columns.sql with PostgreSQL's COPY
+command for better performance and safety. This script is provided as a fallback
+for environments where direct COPY is not available.
+
 Usage:
     python populate_missing_columns.py data_mutations.txt > update_mutations.sql
+    psql -U gene_user -d gene_db -f update_mutations.sql
+
+Input file format: TSV file from cBioPortal with columns:
+    - Hugo_Symbol (gene name)
+    - Chromosome, Start_Position, Reference_Allele, Tumor_Seq_Allele2
+    - Tumor_Sample_Barcode (sample_id)
+    - HGVSp_Short (protein_change)
 """
 
 import sys
@@ -67,11 +87,12 @@ def generate_update_statements(input_file):
                 if not gene_name or gene_name == 'Unknown' or not chromosome:
                     continue
                 
-                # SQL-safe strings
+                # SQL-safe strings - escape single quotes for SQL
                 gene_name_safe = gene_name.replace("'", "''")
                 ref_allele_safe = ref_allele.replace("'", "''")
                 alt_allele_safe = alt_allele.replace("'", "''")
                 sample_id_safe = sample_id.replace("'", "''")
+                # Use None/NULL for missing protein_change instead of empty string
                 protein_change_safe = protein_change.replace("'", "''") if protein_change else None
                 
                 updates.append({
@@ -89,11 +110,14 @@ def generate_update_statements(input_file):
                 continue
     
     # Generate UPDATE statements
+    # NOTE: This script outputs SQL for review before execution. 
+    # For production use, consider using parameterized queries with psycopg2 or SQLAlchemy.
     print("-- Begin transaction for safety")
     print("BEGIN;")
     print("")
     
-    for i, upd in enumerate(updates):
+    max_updates = 1000  # Configurable limit
+    for i, upd in enumerate(updates[:max_updates]):
         protein_val = f"'{upd['protein_change']}'" if upd['protein_change'] else 'NULL'
         
         update_stmt = f"""UPDATE mutations
@@ -110,14 +134,15 @@ WHERE gene_name = '{upd['gene_name']}'
         
         # Add progress indicator every 100 records
         if (i + 1) % 100 == 0:
-            print(f"-- Progress: {i + 1}/{len(updates)} updates generated")
+            print(f"-- Progress: {i + 1}/{min(len(updates), max_updates)} updates generated", file=sys.stderr)
             print("")
     
     print("")
     print("-- Commit the transaction")
     print("COMMIT;")
     print("")
-    print(f"-- Total update statements generated: {len(updates)}")
+    print(f"-- Total mutations parsed: {len(updates)}")
+    print(f"-- SQL statements generated: {min(len(updates), max_updates)}")
     print("")
     print("-- Verification queries")
     print("SELECT COUNT(*) as total_mutations FROM mutations;")
