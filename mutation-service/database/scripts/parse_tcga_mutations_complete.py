@@ -132,7 +132,7 @@ def parse_tcga_mutations(input_file):
             f"'Lung Adenocarcinoma (TCGA)', '{mut['clinical_sig']}')"
         )
         
-        if i < len(mutations) - 1 and i < 999:
+        if i < min(len(mutations), 1000) - 1:
             print(sql_line + ",")
         else:
             print(sql_line + ";")
