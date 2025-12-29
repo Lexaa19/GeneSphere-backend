@@ -145,7 +145,7 @@ WHERE gene_name = '{upd['gene_name']}'
         
         # Add progress indicator every 100 records
         if (i + 1) % 100 == 0:
-            print(f"-- Progress: {i + 1}/{min(len(updates), max_updates)} updates generated", file=sys.stderr)
+            print(f"-- Progress: {i + 1}/{min(len(updates), max_updates)} updates generated")
             print("")
     
     print("")
