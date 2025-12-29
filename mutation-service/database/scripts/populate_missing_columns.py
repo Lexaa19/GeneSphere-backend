@@ -92,7 +92,7 @@ def generate_update_statements(input_file):
                 ref_allele = fields[ref_idx].strip()
                 alt_allele = fields[tumor_allele_idx].strip()
                 sample_id = fields[sample_idx].strip()
-                protein_change = fields[protein_idx].strip() if protein_idx < len(fields) and fields[protein_idx].strip() else None
+                protein_change = fields[protein_idx].strip() or None
                 
                 # Skip invalid entries
                 if not gene_name or gene_name == 'Unknown' or not chromosome:
