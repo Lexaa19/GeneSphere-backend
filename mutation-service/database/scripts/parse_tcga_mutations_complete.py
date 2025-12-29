@@ -143,7 +143,7 @@ def parse_tcga_mutations(input_file):
     print("")
     print("-- Verification queries")
     print("SELECT COUNT(*) as total FROM mutations;")
-    print("SELECT gene_symbol, COUNT(*) as count FROM mutations GROUP BY gene_symbol ORDER BY count DESC LIMIT 10;")
+    print("SELECT gene_name, COUNT(*) as count FROM mutations GROUP BY gene_name ORDER BY count DESC LIMIT 10;")
     print("SELECT protein_change, COUNT(*) as count FROM mutations WHERE protein_change IS NOT NULL GROUP BY protein_change ORDER BY count DESC LIMIT 10;")
 
 
