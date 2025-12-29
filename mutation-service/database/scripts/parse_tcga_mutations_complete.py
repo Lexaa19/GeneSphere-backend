@@ -57,7 +57,7 @@ def parse_tcga_mutations(input_file):
                 alt_allele = fields[tumor_allele_idx].strip()
                 variant_class = fields[variant_class_idx].strip()
                 sample_id = fields[sample_idx].strip()
-                protein_change = fields[protein_idx].strip() if protein_idx < len(fields) else ''
+                protein_change = fields[protein_idx].strip() if len(fields) > protein_idx and fields[protein_idx].strip() else ''
                 
                 # Skip invalid entries
                 if not gene_symbol or gene_symbol == 'Unknown' or not chromosome:
