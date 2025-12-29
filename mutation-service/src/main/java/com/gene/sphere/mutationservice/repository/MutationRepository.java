@@ -128,20 +128,6 @@ public interface MutationRepository extends JpaRepository<Mutation, Integer> {
      */
     List<Mutation> findByGeneNameIn(List<String> geneNames);
 
-    /**
-     * Finds distinct sample IDs with mutations in a gene.
-     * @param geneName gene symbol
-     * @return list of unique sample IDs
-     */
-    @Query("SELECT DISTINCT m.sampleId FROM Mutation m WHERE m.geneName = ?1 AND m.sampleId IS NOT NULL")
-    List<String> findDistinctSampleIdsByGeneName(String geneName);
-
-    /**
-     * Counts total unique patients in the dataset.
-     * @return count of distinct samples
-     */
-    @Query("SELECT COUNT(DISTINCT m.sampleId) FROM Mutation m WHERE m.sampleId IS NOT NULL")
-    Long countDistinctSampleIds();
 
     /**
      * Finds mutations in a genomic region.
