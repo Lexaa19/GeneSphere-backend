@@ -16,7 +16,6 @@ public class Mutation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull(message="Mutation ID cannot be null")
     /**
      * Auto-generated primary key for the mutation record.
      * This unique identifier distinguishes each mutation entry in the database.

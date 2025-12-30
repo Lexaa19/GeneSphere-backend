@@ -112,16 +112,14 @@ class MutationTest {
     @Test
     void testKOValidation(){
         var koMutation = new Mutation();
-        koMutation.setId(null);
         koMutation.setGeneName(null);
         koMutation.setChromosome(null);
 
         Set<ConstraintViolation<Mutation>> violation = validator.validate(koMutation);
         assertFalse(violation.isEmpty());
-        assertThat(violation).hasSize(3);
+        assertThat(violation).hasSize(2);
         assertThat(violation).extracting(ConstraintViolation::getMessage)
                 .containsExactlyInAnyOrder(
-                        "Mutation ID cannot be null",
                        "Gene name cannot be null",
                         "Chromosome cannot be null"
                 );
