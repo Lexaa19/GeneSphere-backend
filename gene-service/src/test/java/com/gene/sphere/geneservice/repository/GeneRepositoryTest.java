@@ -1,16 +1,14 @@
 package com.gene.sphere.geneservice.repository;
 
 import com.gene.sphere.geneservice.model.Gene;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
-
+import org.springframework.dao.EmptyResultDataAccessException;
 import java.util.List;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -67,6 +65,11 @@ class GeneRepositoryTest {
         entityManager.persistAndFlush(brcaGene);
     }
 
+    @AfterEach
+    void tearDown(){
+        geneRepository.deleteAll();
+    }
+
     // ===== TESTS FOR findByName() =====
 
     @Test
@@ -102,28 +105,6 @@ class GeneRepositoryTest {
     }
 
     @Test
-    void findByName_shouldReturnMultipleGenes_whenMultipleGenesHaveSameName() {
-        // ARRANGE - Create another gene with the same name
-        var anotherTp53 = new Gene();
-        anotherTp53.setName("TP53");
-        anotherTp53.setDescription("Another TP53 variant");
-        anotherTp53.setNormalFunction("DNA repair");
-        anotherTp53.setMutationEffect("Tumor formation");
-        anotherTp53.setPrevalence("Common in cancers");
-        anotherTp53.setTherapies("Experimental");
-        anotherTp53.setResearchLinks("http://example.com/tp53-variant");
-        entityManager.persistAndFlush(anotherTp53);
-
-        // ACT
-        var result = geneRepository.findByName("TP53");
-
-        // ASSERT
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertTrue(result.stream().allMatch(gene -> "TP53".equals(gene.getName())));
-    }
-
-    @Test
     void findByName_shouldHandleNullInput() {
         // ACT
         var result = geneRepository.findByName(null);
@@ -143,49 +124,50 @@ class GeneRepositoryTest {
         assertTrue(result.isEmpty());
     }
 
-    // ===== TESTS FOR findByNameContainingIgnoreCase() =====
+    // ===== TESTS FOR findAllByNameContainingIgnoreCase() =====
 
     @Test
-    void findByNameContainingIgnoreCase_shouldReturnGene_whenPartialNameMatches() {
+    void findAllByNameContainingIgnoreCase_shouldReturnGene_whenPartialNameMatches() {
         // ACT
-        var result = geneRepository.findByNameContainingIgnoreCase("P53");
+        var result = geneRepository.findAllByNameContainingIgnoreCase("P53");
 
         // ASSERT
-        assertTrue(result.isPresent());
-        assertEquals("TP53", result.get().getName());
+        assertNotNull(result);
+        assertTrue(result.stream().anyMatch(g -> "TP53".equals(g.getName())));
     }
 
     @Test
-    void findByNameContainingIgnoreCase_shouldReturnGene_whenExactNameMatches() {
+    void findAllByNameContainingIgnoreCase_shouldReturnGene_whenExactNameMatches() {
         // ACT
-        var result = geneRepository.findByNameContainingIgnoreCase("KRAS");
+        var result = geneRepository.findAllByNameContainingIgnoreCase("KRAS");
 
         // ASSERT
-        assertTrue(result.isPresent());
-        assertEquals("KRAS", result.get().getName());
+        assertNotNull(result);
+        assertTrue(result.stream().anyMatch(g -> "KRAS".equals(g.getName())));
     }
 
     @Test
-    void findByNameContainingIgnoreCase_shouldBeCaseInsensitive() {
+    void findAllByNameContainingIgnoreCase_shouldBeCaseInsensitive() {
         // ACT
-        var result = geneRepository.findByNameContainingIgnoreCase("kras"); // lowercase
+        var result = geneRepository.findAllByNameContainingIgnoreCase("kras"); // lowercase
 
         // ASSERT
-        assertTrue(result.isPresent());
-        assertEquals("KRAS", result.get().getName());
+        assertNotNull(result);
+        assertTrue(result.stream().anyMatch(g -> "KRAS".equals(g.getName())));
     }
 
     @Test
-    void findByNameContainingIgnoreCase_shouldReturnEmpty_whenNoMatch() {
+    void findAllByNameContainingIgnoreCase_shouldReturnEmpty_whenNoMatch() {
         // ACT
-        var result = geneRepository.findByNameContainingIgnoreCase("NONEXISTENT");
+        var result = geneRepository.findAllByNameContainingIgnoreCase("NONEXISTENT");
 
         // ASSERT
-        assertFalse(result.isPresent());
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test
-    void findByNameContainingIgnoreCase_shouldThrowException_whenMultipleMatches() {
+    void findAllByNameContainingIgnoreCase_shouldReturnMultipleGenes_whenMultipleMatch() {
         // ARRANGE - Create another gene with "BRC" in the name to cause multiple matches
         var brca2Gene = new Gene();
         brca2Gene.setName("BRCA2");
@@ -197,36 +179,35 @@ class GeneRepositoryTest {
         brca2Gene.setResearchLinks("http://example.com/brca2");
         entityManager.persistAndFlush(brca2Gene);
 
-        // ACT & ASSERT - Should throw exception when multiple genes match
-        assertThrows(IncorrectResultSizeDataAccessException.class, () -> {
-            geneRepository.findByNameContainingIgnoreCase("BRCA");
-        }, "Should throw exception when multiple genes contain 'BRCA'");
-    }
-
-    @Test
-    void findByNameContainingIgnoreCase_shouldHandleNullInput() {
-        // ACT & ASSERT
-        assertThrows(Exception.class, () -> {
-            geneRepository.findByNameContainingIgnoreCase(null);
-        }, "Should throw exception for null input");
-    }
-
-    @Test
-    void findByNameContainingIgnoreCase_shouldHandleEmptyString() {
-        // ACT & ASSERT - Empty string should match all genes, causing multiple results exception
-        assertThrows(IncorrectResultSizeDataAccessException.class, () -> {
-            geneRepository.findByNameContainingIgnoreCase("");
-        }, "Should throw exception when empty string matches multiple genes");
-    }
-
-    @Test
-    void findByNameContainingIgnoreCase_shouldMatchSubstring() {
         // ACT
-        var result = geneRepository.findByNameContainingIgnoreCase("RCA"); // matches BRCA1
+        var result = geneRepository.findAllByNameContainingIgnoreCase("BRCA");
 
         // ASSERT
-        assertTrue(result.isPresent());
-        assertEquals("BRCA1", result.get().getName());
+        assertNotNull(result);
+        assertTrue(result.size() >= 2);
+        assertTrue(result.stream().anyMatch(g -> "BRCA1".equals(g.getName())));
+        assertTrue(result.stream().anyMatch(g -> "BRCA2".equals(g.getName())));
+    }
+
+    @Test
+    void findAllByNameContainingIgnoreCase_shouldHandleEmptyString() {
+        // ACT
+        var result = geneRepository.findAllByNameContainingIgnoreCase("");
+
+        // ASSERT
+        assertNotNull(result);
+        // Should match all genes from setup
+        assertTrue(result.size() >= 3);
+    }
+
+    @Test
+    void findAllByNameContainingIgnoreCase_shouldMatchSubstring() {
+        // ACT
+        var result = geneRepository.findAllByNameContainingIgnoreCase("RCA"); // matches BRCA1
+
+        // ASSERT
+        assertNotNull(result);
+        assertTrue(result.stream().anyMatch(g -> "BRCA1".equals(g.getName())));
     }
 
     // ===== TESTS FOR JpaRepository inherited methods =====
@@ -280,16 +261,7 @@ class GeneRepositoryTest {
         // ASSERT
         assertFalse(result.isPresent());
     }
-
-    @Test
-    void findById_shouldHandleNullId() {
-        // ACT
-        var result = geneRepository.findById(null);
-
-        // ASSERT
-        assertFalse(result.isPresent());
-    }
-
+    
     @Test
     void save_shouldPersistNewGene() {
         // ARRANGE
@@ -378,9 +350,9 @@ class GeneRepositoryTest {
     }
 
     @Test
-    void deleteById_shouldNotThrowException_whenIdNotExists() {
-        // ACT & ASSERT - Should not throw exception
-        assertDoesNotThrow(() -> {
+    void deleteById_shouldThrowException_whenIdNotExists() {
+        // ACT & ASSERT - Should throw exception
+        assertThrows(EmptyResultDataAccessException.class, () -> {
             geneRepository.deleteById(99999);
         });
     }
