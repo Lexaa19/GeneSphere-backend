@@ -2,6 +2,7 @@ package com.gene.sphere.mutationservice.model;
 
 import lombok.Data;
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
@@ -15,17 +16,19 @@ public class Mutation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull(message="Mutation ID cannot be null")
     /**
      * Auto-generated primary key for the mutation record.
      * This unique identifier distinguishes each mutation entry in the database.
      */
-    private Long id;
+    private Integer id;
 
     /**
      * Gene name (HGNC symbol) where the mutation occurs.
      * Example: "EGFR", "KRAS", "TP53"
      */
     @Column(name = "gene_name", nullable = false, length = 50)
+    @NotNull(message="Gene name cannot be null")
     private String geneName;
 
     /**
@@ -33,6 +36,7 @@ public class Mutation {
      * Values: 1-22 (autosomes), X, Y (sex chromosomes), MT (mitochondrial)
      */
     @Column(name = "chromosome", nullable = false, length = 5)
+    @NotNull(message="Chromosome cannot be null")
     private String chromosome;
 
     /**
