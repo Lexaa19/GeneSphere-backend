@@ -84,7 +84,7 @@ class GeneRepositoryTest {
     @Test
     void findByName_shouldReturnEmptyList_whenNameNotFound() {
         // ACT
-        List<Gene> result = geneRepository.findByName("NONEXISTENT");
+        var result = geneRepository.findByName("NONEXISTENT");
 
         // ASSERT
         assertNotNull(result);
@@ -104,7 +104,7 @@ class GeneRepositoryTest {
     @Test
     void findByName_shouldReturnMultipleGenes_whenMultipleGenesHaveSameName() {
         // ARRANGE - Create another gene with the same name
-        Gene anotherTp53 = new Gene();
+        var anotherTp53 = new Gene();
         anotherTp53.setName("TP53");
         anotherTp53.setDescription("Another TP53 variant");
         anotherTp53.setNormalFunction("DNA repair");
@@ -115,7 +115,7 @@ class GeneRepositoryTest {
         entityManager.persistAndFlush(anotherTp53);
 
         // ACT
-        List<Gene> result = geneRepository.findByName("TP53");
+        var result = geneRepository.findByName("TP53");
 
         // ASSERT
         assertNotNull(result);
@@ -126,7 +126,7 @@ class GeneRepositoryTest {
     @Test
     void findByName_shouldHandleNullInput() {
         // ACT
-        List<Gene> result = geneRepository.findByName(null);
+        var result = geneRepository.findByName(null);
 
         // ASSERT
         assertNotNull(result);
@@ -136,7 +136,7 @@ class GeneRepositoryTest {
     @Test
     void findByName_shouldHandleEmptyString() {
         // ACT
-        List<Gene> result = geneRepository.findByName("");
+        var result = geneRepository.findByName("");
 
         // ASSERT
         assertNotNull(result);
@@ -148,7 +148,7 @@ class GeneRepositoryTest {
     @Test
     void findByNameContainingIgnoreCase_shouldReturnGene_whenPartialNameMatches() {
         // ACT
-        Optional<Gene> result = geneRepository.findByNameContainingIgnoreCase("P53");
+        var result = geneRepository.findByNameContainingIgnoreCase("P53");
 
         // ASSERT
         assertTrue(result.isPresent());
@@ -158,7 +158,7 @@ class GeneRepositoryTest {
     @Test
     void findByNameContainingIgnoreCase_shouldReturnGene_whenExactNameMatches() {
         // ACT
-        Optional<Gene> result = geneRepository.findByNameContainingIgnoreCase("KRAS");
+        var result = geneRepository.findByNameContainingIgnoreCase("KRAS");
 
         // ASSERT
         assertTrue(result.isPresent());
@@ -168,7 +168,7 @@ class GeneRepositoryTest {
     @Test
     void findByNameContainingIgnoreCase_shouldBeCaseInsensitive() {
         // ACT
-        Optional<Gene> result = geneRepository.findByNameContainingIgnoreCase("kras"); // lowercase
+        var result = geneRepository.findByNameContainingIgnoreCase("kras"); // lowercase
 
         // ASSERT
         assertTrue(result.isPresent());
@@ -178,7 +178,7 @@ class GeneRepositoryTest {
     @Test
     void findByNameContainingIgnoreCase_shouldReturnEmpty_whenNoMatch() {
         // ACT
-        Optional<Gene> result = geneRepository.findByNameContainingIgnoreCase("NONEXISTENT");
+        var result = geneRepository.findByNameContainingIgnoreCase("NONEXISTENT");
 
         // ASSERT
         assertFalse(result.isPresent());
@@ -187,7 +187,7 @@ class GeneRepositoryTest {
     @Test
     void findByNameContainingIgnoreCase_shouldThrowException_whenMultipleMatches() {
         // ARRANGE - Create another gene with "BRC" in the name to cause multiple matches
-        Gene brca2Gene = new Gene();
+        var brca2Gene = new Gene();
         brca2Gene.setName("BRCA2");
         brca2Gene.setDescription("Another breast cancer gene");
         brca2Gene.setNormalFunction("DNA repair");
@@ -222,7 +222,7 @@ class GeneRepositoryTest {
     @Test
     void findByNameContainingIgnoreCase_shouldMatchSubstring() {
         // ACT
-        Optional<Gene> result = geneRepository.findByNameContainingIgnoreCase("RCA"); // matches BRCA1
+        var result = geneRepository.findByNameContainingIgnoreCase("RCA"); // matches BRCA1
 
         // ASSERT
         assertTrue(result.isPresent());
@@ -234,14 +234,14 @@ class GeneRepositoryTest {
     @Test
     void findAll_shouldReturnAllGenes() {
         // ACT
-        List<Gene> result = geneRepository.findAll();
+        var result = geneRepository.findAll();
 
         // ASSERT
         assertNotNull(result);
         assertEquals(3, result.size(), "Should find all 3 genes from setup");
         
         // Verify all genes are present
-        List<String> geneNames = result.stream().map(Gene::getName).toList();
+        var geneNames = result.stream().map(Gene::getName).toList();
         assertTrue(geneNames.contains("TP53"));
         assertTrue(geneNames.contains("KRAS"));
         assertTrue(geneNames.contains("BRCA1"));
@@ -254,7 +254,7 @@ class GeneRepositoryTest {
         entityManager.flush();
 
         // ACT
-        List<Gene> result = geneRepository.findAll();
+        var result = geneRepository.findAll();
 
         // ASSERT
         assertNotNull(result);
@@ -264,7 +264,7 @@ class GeneRepositoryTest {
     @Test
     void findById_shouldReturnGene_whenIdExists() {
         // ACT
-        Optional<Gene> result = geneRepository.findById(tp53Gene.getId());
+        var result = geneRepository.findById(tp53Gene.getId());
 
         // ASSERT
         assertTrue(result.isPresent());
@@ -275,7 +275,7 @@ class GeneRepositoryTest {
     @Test
     void findById_shouldReturnEmpty_whenIdNotExists() {
         // ACT
-        Optional<Gene> result = geneRepository.findById(99999);
+        var result = geneRepository.findById(99999);
 
         // ASSERT
         assertFalse(result.isPresent());
@@ -284,7 +284,7 @@ class GeneRepositoryTest {
     @Test
     void findById_shouldHandleNullId() {
         // ACT
-        Optional<Gene> result = geneRepository.findById(null);
+        var result = geneRepository.findById(null);
 
         // ASSERT
         assertFalse(result.isPresent());
@@ -293,7 +293,7 @@ class GeneRepositoryTest {
     @Test
     void save_shouldPersistNewGene() {
         // ARRANGE
-        Gene newGene = new Gene();
+        var newGene = new Gene();
         newGene.setName("EGFR");
         newGene.setDescription("Epidermal growth factor receptor");
         newGene.setNormalFunction("Cell growth signaling");
@@ -303,14 +303,14 @@ class GeneRepositoryTest {
         newGene.setResearchLinks("http://example.com/egfr");
 
         // ACT
-        Gene saved = geneRepository.save(newGene);
+        var saved = geneRepository.save(newGene);
 
         // ASSERT
         assertNotNull(saved.getId(), "Saved gene should have an ID");
         assertEquals("EGFR", saved.getName());
         
         // Verify it's actually persisted
-        Optional<Gene> found = geneRepository.findById(saved.getId());
+        var found = geneRepository.findById(saved.getId());
         assertTrue(found.isPresent());
         assertEquals("EGFR", found.get().getName());
     }
@@ -322,7 +322,7 @@ class GeneRepositoryTest {
         tp53Gene.setPrevalence("60% of all cancers"); // Updated value
 
         // ACT
-        Gene updated = geneRepository.save(tp53Gene);
+        var updated = geneRepository.save(tp53Gene);
 
         // ASSERT
         assertEquals(tp53Gene.getId(), updated.getId(), "ID should remain the same");
@@ -330,7 +330,7 @@ class GeneRepositoryTest {
         assertEquals("60% of all cancers", updated.getPrevalence());
         
         // Verify changes are persisted
-        Optional<Gene> found = geneRepository.findById(tp53Gene.getId());
+        var found = geneRepository.findById(tp53Gene.getId());
         assertTrue(found.isPresent());
         assertEquals("Updated tumor suppressor gene", found.get().getDescription());
         assertEquals("60% of all cancers", found.get().getPrevalence());
@@ -339,7 +339,7 @@ class GeneRepositoryTest {
     @Test
     void save_shouldHandleAllFieldsCorrectly() {
         // ARRANGE
-        Gene complexGene = new Gene();
+        var complexGene = new Gene();
         complexGene.setName("COMPLEX_GENE");
         complexGene.setDescription("A gene with all fields populated");
         complexGene.setNormalFunction("Multiple cellular processes");
@@ -349,7 +349,7 @@ class GeneRepositoryTest {
         complexGene.setResearchLinks("http://example.com/complex;http://pubmed.com/123456;http://clinicaltrials.gov/789");
 
         // ACT
-        Gene saved = geneRepository.save(complexGene);
+        var saved = geneRepository.save(complexGene);
 
         // ASSERT
         assertNotNull(saved.getId());
@@ -365,7 +365,7 @@ class GeneRepositoryTest {
     @Test
     void deleteById_shouldRemoveGene() {
         // ARRANGE
-        Integer geneIdToDelete = tp53Gene.getId();
+        var geneIdToDelete = tp53Gene.getId();
         assertTrue(geneRepository.findById(geneIdToDelete).isPresent(), "Gene should exist before deletion");
 
         // ACT
@@ -373,7 +373,7 @@ class GeneRepositoryTest {
         entityManager.flush(); // Ensure deletion is processed
 
         // ASSERT
-        Optional<Gene> result = geneRepository.findById(geneIdToDelete);
+        var result = geneRepository.findById(geneIdToDelete);
         assertFalse(result.isPresent(), "Gene should not exist after deletion");
     }
 
@@ -395,14 +395,14 @@ class GeneRepositoryTest {
         entityManager.flush();
 
         // ASSERT
-        List<Gene> result = geneRepository.findAll();
+        var result = geneRepository.findAll();
         assertTrue(result.isEmpty(), "Should have no genes after deleteAll");
     }
 
     @Test
     void count_shouldReturnCorrectCount() {
         // ACT
-        long count = geneRepository.count();
+        var count = geneRepository.count();
 
         // ASSERT
         assertEquals(3, count, "Should count 3 genes from setup");
@@ -415,7 +415,7 @@ class GeneRepositoryTest {
         entityManager.flush();
 
         // ACT
-        long count = geneRepository.count();
+        var count = geneRepository.count();
 
         // ASSERT
         assertEquals(0, count, "Should count 0 genes after deletion");
@@ -424,7 +424,7 @@ class GeneRepositoryTest {
     @Test
     void existsById_shouldReturnTrue_whenGeneExists() {
         // ACT
-        boolean exists = geneRepository.existsById(tp53Gene.getId());
+        var exists = geneRepository.existsById(tp53Gene.getId());
 
         // ASSERT
         assertTrue(exists, "Should return true for existing gene ID");
@@ -433,7 +433,7 @@ class GeneRepositoryTest {
     @Test
     void existsById_shouldReturnFalse_whenGeneNotExists() {
         // ACT
-        boolean exists = geneRepository.existsById(99999);
+        var exists = geneRepository.existsById(99999);
 
         // ASSERT
         assertFalse(exists, "Should return false for non-existing gene ID");
@@ -444,8 +444,8 @@ class GeneRepositoryTest {
     @Test
     void repository_shouldHandleLongStrings() {
         // ARRANGE
-        String longDescription = "A".repeat(1000); // Very long description
-        Gene geneWithLongFields = new Gene();
+        var longDescription = "A".repeat(1000); // Very long description
+        var geneWithLongFields = new Gene();
         geneWithLongFields.setName("LONG_GENE");
         geneWithLongFields.setDescription(longDescription);
         geneWithLongFields.setNormalFunction("Normal function");
@@ -455,7 +455,7 @@ class GeneRepositoryTest {
         geneWithLongFields.setResearchLinks("http://example.com/long");
 
         // ACT
-        Gene saved = geneRepository.save(geneWithLongFields);
+        var saved = geneRepository.save(geneWithLongFields);
 
         // ASSERT
         assertNotNull(saved.getId());
@@ -465,17 +465,17 @@ class GeneRepositoryTest {
     @Test
     void repository_shouldHandleSpecialCharacters() {
         // ARRANGE
-        Gene geneWithSpecialChars = new Gene();
+        var geneWithSpecialChars = new Gene();
         geneWithSpecialChars.setName("GENE-α/β");
         geneWithSpecialChars.setDescription("Gene with special chars: αβγδε & symbols !@#$%");
         geneWithSpecialChars.setNormalFunction("Function with unicode: ™®©");
-        geneWithSpecialChars.setMutationEffect("Effect with quotes: \"double\" and 'single'");
+        geneWithSpecialChars.setMutationEffect("Effect with quotes: \"double\" and 'single'\"");
         geneWithSpecialChars.setPrevalence("Prevalence: 50% ± 5%");
         geneWithSpecialChars.setTherapies("Therapies: drug-X & drug-Y");
         geneWithSpecialChars.setResearchLinks("http://example.com/gene?param=value&other=123");
 
         // ACT
-        Gene saved = geneRepository.save(geneWithSpecialChars);
+        var saved = geneRepository.save(geneWithSpecialChars);
 
         // ASSERT
         assertNotNull(saved.getId());
