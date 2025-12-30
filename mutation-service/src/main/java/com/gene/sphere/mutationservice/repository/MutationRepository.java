@@ -15,7 +15,7 @@ import java.util.List;
  * <p>Data source: TCGA (The Cancer Genome Atlas) lung cancer mutation data from cBioPortal.</p>
  */
 @Repository
-public interface MutationRepository extends JpaRepository<Mutation, Long> {
+public interface MutationRepository extends JpaRepository<Mutation, Integer> {
 
     /**
      * Finds all mutations for a specific gene.
