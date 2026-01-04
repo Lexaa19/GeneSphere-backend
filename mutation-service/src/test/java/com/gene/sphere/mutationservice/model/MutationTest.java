@@ -105,7 +105,6 @@ class MutationTest {
     void testOKValidation(){
         var mutation = getMutation();
         Set<ConstraintViolation<Mutation>> violations = validator.validate(mutation);
-        assertTrue(violations.isEmpty());
         assertThat(violations).hasSize(0);
     }
 
