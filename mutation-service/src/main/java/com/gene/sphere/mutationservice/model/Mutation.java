@@ -35,7 +35,7 @@ public class Mutation {
      * Values: 1-22 (autosomes), X, Y (sex chromosomes), MT (mitochondrial)
      */
     @Column(name = "chromosome", nullable = false, length = 5)
-    @NotNull(message="Chromosome cannot be null")
+    @NotNull(message = "Chromosome cannot be null")
     private String chromosome;
 
     /**
