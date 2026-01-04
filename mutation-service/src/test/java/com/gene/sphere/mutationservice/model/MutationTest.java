@@ -124,9 +124,9 @@ class MutationTest {
                 );
     }
 
-     @Test
+    @Test
     void testMinimalMutation() {
-         var mutation = new Mutation();
+        var mutation = new Mutation();
         mutation.setId(1);
         // All other fields are null by default
         assertEquals(1, mutation.getId());
