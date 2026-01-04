@@ -27,7 +27,7 @@ public class Mutation {
      * Example: "EGFR", "KRAS", "TP53"
      */
     @Column(name = "gene_name", nullable = false, length = 50)
-    @NotNull(message="Gene name cannot be null")
+    @NotNull(message = "Gene name cannot be null")
     private String geneName;
 
     /**
