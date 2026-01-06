@@ -81,7 +81,7 @@ class MutationRepositoryTest {
     }
 
     @Test
-    void findByName_shouldReturnMutation_whenExactNameMatches() {
+    void findByGeneName_shouldReturnMutation_whenExactNameMatches() {
         // ACT
         List<Mutation> result = mutationRepository.findByGeneName("TP53");
 
