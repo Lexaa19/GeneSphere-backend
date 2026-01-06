@@ -487,7 +487,7 @@ class MutationRepositoryTest {
     void existsByGeneNameAndProteinChange() {
         assertTrue(mutationRepository.existsByGeneNameAndProteinChange("EGFR", "p.L858R"));
         assertTrue(mutationRepository.existsByGeneNameAndProteinChange("egfr", "p.l858r"));
-        assertFalse(mutationRepository.existsByGeneNameAndProteinChange("EGFR", "treefr"));
+        assertFalse(mutationRepository.existsByGeneNameAndProteinChange("EGFR", "p.NONEXISTENT"));
     }
 
     @Test
