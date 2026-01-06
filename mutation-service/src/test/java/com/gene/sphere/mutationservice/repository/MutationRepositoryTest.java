@@ -242,7 +242,11 @@ class MutationRepositoryTest {
     }
 
 
-    void addDuplicatedProteinChange() {
+    /**
+     * Inserts two mutations with the same protein change into the test database
+     * to verify behavior when duplicate protein changes are present.
+     */
+    private void addDuplicatedProteinChange() {
         Mutation mutation1 = new Mutation();
         mutation1.setGeneName("MET");
         mutation1.setChromosome("8");
