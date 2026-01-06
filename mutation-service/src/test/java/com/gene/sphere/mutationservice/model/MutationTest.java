@@ -104,7 +104,7 @@ class MutationTest {
     }
 
     @Test
-    void testOKValidation(){
+    void validate_shouldReturnNoViolations_whenMutationIsValid() {
         var mutation = getMutation();
         Set<ConstraintViolation<Mutation>> violations = validator.validate(mutation);
         assertThat(violations).hasSize(0);
