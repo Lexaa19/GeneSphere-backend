@@ -111,7 +111,7 @@ class MutationTest {
     }
 
     @Test
-    void testKOValidation(){
+    void testKoValidation(){
         var koMutation = new Mutation();
         koMutation.setGeneName(null);
         koMutation.setChromosome(null);
