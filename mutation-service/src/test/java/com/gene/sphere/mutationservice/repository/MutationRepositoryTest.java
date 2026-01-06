@@ -274,25 +274,36 @@ class MutationRepositoryTest {
      * allele frequencies, used to set up test data for repository queries.
      */
     private void addDifferentAlleleFrequency() {
-    Mutation mutation1 = createMutation(
-        "MET", "8", 123456L, "A", "T", "SNV",
-        "PATIENT-5", "SAMPLE-5", "p.M123T",
-        "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.55")
-    );
-    Mutation mutation2 = createMutation(
-        "CDC6", "8", 654321L, "G", "C", "SNV",
-        "PATIENT-6", "SAMPLE-6", "p.M123T",
-        "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.45")
-    );
-    Mutation mutation3 = createMutation(
-        "CDC6", "7", 140453136L, "A", "T", "SNV",
-        "PATIENT-12", "SAMPLE-12", "p.V600E",
-        "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.60")
-    );
-    persistMutation(mutation1);
-    persistMutation(mutation2);
-    persistMutation(mutation3);
+        createAndPersistMutation(
+            "MET", "8", 123456L, "A", "T", "SNV",
+            "PATIENT-5", "SAMPLE-5", "p.M123T",
+            "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.55")
+        );
+        createAndPersistMutation(
+            "CDC6", "8", 654321L, "G", "C", "SNV",
+            "PATIENT-6", "SAMPLE-6", "p.M123T",
+            "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.45")
+        );
+        createAndPersistMutation(
+            "CDC6", "7", 140453136L, "A", "T", "SNV",
+            "PATIENT-12", "SAMPLE-12", "p.V600E",
+            "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.60")
+        );
     }
+
+    /**
+     * Helper to create and persist a Mutation with all fields set.
+     */
+    private Mutation createAndPersistMutation(String geneName, String chromosome, Long position, String referenceAllele,
+                                              String alternateAllele, String mutationType, String patientId,
+                                              String sampleId, String proteinChange, String cancerType,
+                                              String clinicalSignificance, BigDecimal alleleFrequency) {
+        Mutation mutation = createMutation(geneName, chromosome, position, referenceAllele, alternateAllele, mutationType,
+            patientId, sampleId, proteinChange, cancerType, clinicalSignificance, alleleFrequency);
+        persistMutation(mutation);
+        return mutation;
+    }
+
     /**
      * Helper to create a Mutation with all fields set.
      */
