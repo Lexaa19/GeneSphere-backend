@@ -261,7 +261,7 @@ class GeneRepositoryTest {
         // ASSERT
         assertFalse(result.isPresent());
     }
-    
+
     @Test
     void save_shouldPersistNewGene() {
         // ARRANGE
