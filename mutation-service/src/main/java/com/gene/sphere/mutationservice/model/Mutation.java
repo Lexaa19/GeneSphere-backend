@@ -20,7 +20,7 @@ public class Mutation {
      * Auto-generated primary key for the mutation record.
      * This unique identifier distinguishes each mutation entry in the database.
      */
-    private Integer id;
+    private Long id;
 
     /**
      * Gene name (HGNC symbol) where the mutation occurs.
