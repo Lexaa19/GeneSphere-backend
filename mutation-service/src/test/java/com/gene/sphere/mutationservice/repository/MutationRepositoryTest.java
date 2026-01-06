@@ -272,21 +272,24 @@ class MutationRepositoryTest {
 
     @Test
     void findByProteinChange_shouldReturnProtein() {
+        // ARRANGE
         addDuplicatedProteinChange();
         // ACT
         List<Mutation> result = mutationRepository.findByProteinChange("p.M123T");
 
-        // ARRANGE
+        // ASSERT
         assertNotNull(result);
         assertEquals(2, result.size());
     }
 
     @Test
     void findByClinicalSignificance_shouldReturnAllWithSignificance() {
+        // ARRANGE
+        // Data setup is performed in test fixtures
         // ACT
         List<Mutation> result = mutationRepository.findByClinicalSignificance("Pathogenic");
 
-        // ARRANGE
+        // ASSERT
         assertNotNull(result);
         assertEquals(3, result.size());
     }
