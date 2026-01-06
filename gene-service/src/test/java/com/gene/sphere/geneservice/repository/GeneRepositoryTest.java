@@ -441,7 +441,7 @@ class GeneRepositoryTest {
         geneWithSpecialChars.setName("GENE-α/β");
         geneWithSpecialChars.setDescription("Gene with special chars: αβγδε & symbols !@#$%");
         geneWithSpecialChars.setNormalFunction("Function with unicode: ™®©");
-        geneWithSpecialChars.setMutationEffect("Effect with quotes: \"double\" and 'single'\"");
+        geneWithSpecialChars.setMutationEffect("Effect with quotes: \"double\" and 'single'");
         geneWithSpecialChars.setPrevalence("Prevalence: 50% ± 5%");
         geneWithSpecialChars.setTherapies("Therapies: drug-X & drug-Y");
         geneWithSpecialChars.setResearchLinks("http://example.com/gene?param=value&other=123");
