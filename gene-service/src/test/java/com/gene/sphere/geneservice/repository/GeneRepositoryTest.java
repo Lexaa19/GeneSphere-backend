@@ -86,7 +86,7 @@ class GeneRepositoryTest {
     @Test
     void findByName_shouldReturnEmptyList_whenNameNotFound() {
         // ACT
-        var result = geneRepository.findByName("NONEXISTENT");
+        List<Gene> result = geneRepository.findByName("NONEXISTENT");
 
         // ASSERT
         assertNotNull(result);
