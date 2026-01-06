@@ -17,7 +17,6 @@ import java.util.List;
  */
 @Repository
 public interface MutationRepository extends JpaRepository<Mutation, Integer> {
-//
     /**
      * Finds all mutations for a specific gene, case-insensitive.
      * @param geneName HGNC gene symbol (e.g., "EGFR", "KRAS", "TP53")
