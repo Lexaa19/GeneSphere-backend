@@ -395,7 +395,7 @@ class MutationRepositoryTest {
         assertNotNull(tooHigh);
         assertEquals(0, tooHigh.size());
         assertNotNull(negative);
-        assertEquals(1, negative.size()); // Negative threshold currently returns all seeded EGFR mutations (1 in this test)
+        assertEquals(0, negative.size()); // Negative threshold should be treated as invalid input and must not return any mutations
         assertNotNull(missingGene);
         assertEquals(0, missingGene.size());
     }
