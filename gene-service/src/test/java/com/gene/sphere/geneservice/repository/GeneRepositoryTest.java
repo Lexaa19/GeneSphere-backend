@@ -350,11 +350,9 @@ class GeneRepositoryTest {
     }
 
     @Test
-    void deleteById_shouldThrowException_whenIdNotExists() {
-        // ACT & ASSERT - Should throw exception
-        assertThrows(EmptyResultDataAccessException.class, () -> {
-            geneRepository.deleteById(99999);
-        });
+    void deleteById_shouldNotThrow_whenIdNotExists() {
+        // ACT & ASSERT - Should not throw for non-existent ID (Spring Data JPA default behavior)
+        assertDoesNotThrow(() -> geneRepository.deleteById(99999));
     }
 
     @Test
