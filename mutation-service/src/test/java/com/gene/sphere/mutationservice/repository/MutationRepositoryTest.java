@@ -323,7 +323,11 @@ class MutationRepositoryTest {
         assertEquals("Pathogenic", result.get(0).getClinicalSignificance());
     }
 
-    void addDifferentAlleleFrequency() {
+    /**
+     * Helper method to persist multiple {@link Mutation} entities with different
+     * allele frequencies, used to set up test data for repository queries.
+     */
+    private void addDifferentAlleleFrequency() {
         Mutation mutation1 = new Mutation();
         mutation1.setGeneName("MET");
         mutation1.setChromosome("8");
