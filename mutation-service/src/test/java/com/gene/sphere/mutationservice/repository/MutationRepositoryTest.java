@@ -28,51 +28,24 @@ class MutationRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        egfrMutation = new Mutation();
-        egfrMutation.setGeneName("EGFR");
-        egfrMutation.setChromosome("7");
-        egfrMutation.setPosition(55191822L);
-        egfrMutation.setReferenceAllele("G");
-        egfrMutation.setAlternateAllele("T");
-        egfrMutation.setMutationType("SNV");
-        egfrMutation.setPatientId("TCGA-05-4244-01");
-        egfrMutation.setSampleId("TCGA-05-4244-01");
-        egfrMutation.setProteinChange("p.L858R");
-        egfrMutation.setCancerType("Lung Adenocarcinoma (TCGA)");
-        egfrMutation.setClinicalSignificance("Pathogenic");
-        egfrMutation.setAlleleFrequency(new java.math.BigDecimal("0.65"));
-
-        krasMutation = new Mutation();
-        krasMutation.setGeneName("KRAS");
-        krasMutation.setChromosome("12");
-        krasMutation.setPosition(25398284L);
-        krasMutation.setReferenceAllele("G");
-        krasMutation.setAlternateAllele("T");
-        krasMutation.setMutationType("SNV");
-        krasMutation.setPatientId("TCGA-05-4244-02");
-        krasMutation.setSampleId("TCGA-05-4244-02");
-        krasMutation.setProteinChange("p.G12C");
-        krasMutation.setCancerType("Lung Adenocarcinoma (TCGA)");
-        krasMutation.setClinicalSignificance("Pathogenic");
-        krasMutation.setAlleleFrequency(new java.math.BigDecimal("0.72"));
-
-        tp53Mutation = new Mutation();
-        tp53Mutation.setGeneName("TP53");
-        tp53Mutation.setChromosome("17");
-        tp53Mutation.setPosition(7579472L);
-        tp53Mutation.setReferenceAllele("C");
-        tp53Mutation.setAlternateAllele("T");
-        tp53Mutation.setMutationType("SNV");
-        tp53Mutation.setPatientId("TCGA-05-4244-03");
-        tp53Mutation.setSampleId("TCGA-05-4244-03");
-        tp53Mutation.setProteinChange("p.R175H");
-        tp53Mutation.setCancerType("Lung Adenocarcinoma (TCGA)");
-        tp53Mutation.setClinicalSignificance("Pathogenic");
-        tp53Mutation.setAlleleFrequency(new java.math.BigDecimal("0.81"));
-
-        entityManager.persistAndFlush(egfrMutation);
-        entityManager.persistAndFlush(krasMutation);
-        entityManager.persistAndFlush(tp53Mutation);
+    egfrMutation = createMutation(
+        "EGFR", "7", 55191822L, "G", "T", "SNV",
+        "TCGA-05-4244-01", "TCGA-05-4244-01", "p.L858R",
+        "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.65")
+    );
+    krasMutation = createMutation(
+        "KRAS", "12", 25398284L, "G", "T", "SNV",
+        "TCGA-05-4244-02", "TCGA-05-4244-02", "p.G12C",
+        "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.72")
+    );
+    tp53Mutation = createMutation(
+        "TP53", "17", 7579472L, "C", "T", "SNV",
+        "TCGA-05-4244-03", "TCGA-05-4244-03", "p.R175H",
+        "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.81")
+    );
+    persistMutation(egfrMutation);
+    persistMutation(krasMutation);
+    persistMutation(tp53Mutation);
     }
 
     @AfterEach
@@ -83,7 +56,7 @@ class MutationRepositoryTest {
     @Test
     void findByGeneName_shouldReturnMutation_whenExactNameMatches() {
         // ACT
-        List<Mutation> result = mutationRepository.findByGeneName("TP53");
+        List<Mutation> result = mutationRepository.findByGeneNameCaseInsensitive("TP53");
 
         // ASSERT
         assertNotNull(result);
@@ -95,7 +68,7 @@ class MutationRepositoryTest {
     @Test
     void findByGeneName_nonExisting_shouldReturnEmptyList() {
         // ACT
-        List<Mutation> nonExistingGene = mutationRepository.findByGeneName("NONEXISTINGGENE");
+        List<Mutation> nonExistingGene = mutationRepository.findByGeneNameCaseInsensitive("NONEXISTINGGENE");
 
         // ASSERT
         assertNotNull(nonExistingGene);
@@ -126,7 +99,7 @@ class MutationRepositoryTest {
         entityManager.persistAndFlush(mutation1);
 
         // ACT
-        List<Mutation> result = mutationRepository.findByGeneName("TP53");
+        List<Mutation> result = mutationRepository.findByGeneNameCaseInsensitive("TP53");
 
         // ASSERT
         assertNotNull(result);
@@ -177,36 +150,18 @@ class MutationRepositoryTest {
      * Used by tests that require duplicated chromosome data to validate repository queries.
      */
     private void addDuplicatedChromosome() {
-        Mutation mutation1 = new Mutation();
-        mutation1.setGeneName("MET");
-        mutation1.setChromosome("8");
-        mutation1.setPosition(123456L);
-        mutation1.setReferenceAllele("A");
-        mutation1.setAlternateAllele("T");
-        mutation1.setMutationType("SNV");
-        mutation1.setPatientId("PATIENT-5");
-        mutation1.setSampleId("SAMPLE-5");
-        mutation1.setProteinChange("p.M123T");
-        mutation1.setCancerType("Lung Adenocarcinoma (TCGA)");
-        mutation1.setClinicalSignificance("Pathogenic");
-        mutation1.setAlleleFrequency(new BigDecimal("0.50"));
-
-        Mutation mutation2 = new Mutation();
-        mutation2.setGeneName("CDC6");
-        mutation2.setChromosome("8");
-        mutation2.setPosition(654321L);
-        mutation2.setReferenceAllele("G");
-        mutation2.setAlternateAllele("C");
-        mutation2.setMutationType("SNV");
-        mutation2.setPatientId("PATIENT-6");
-        mutation2.setSampleId("SAMPLE-6");
-        mutation2.setProteinChange("p.C456G");
-        mutation2.setCancerType("Lung Adenocarcinoma (TCGA)");
-        mutation2.setClinicalSignificance("Pathogenic");
-        mutation2.setAlleleFrequency(new BigDecimal("0.45"));
-
-        entityManager.persistAndFlush(mutation1);
-        entityManager.persistAndFlush(mutation2);
+        Mutation mutation1 = createMutation(
+                "MET", "8", 123456L, "A", "T", "SNV",
+                "PATIENT-5", "SAMPLE-5", "p.M123T",
+                "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.50")
+        );
+        Mutation mutation2 = createMutation(
+                "CDC6", "8", 654321L, "G", "C", "SNV",
+                "PATIENT-6", "SAMPLE-6", "p.C456G",
+                "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.45")
+        );
+        persistMutation(mutation1);
+        persistMutation(mutation2);
     }
 
     @Test
@@ -247,36 +202,18 @@ class MutationRepositoryTest {
      * to verify behavior when duplicate protein changes are present.
      */
     private void addDuplicatedProteinChange() {
-        Mutation mutation1 = new Mutation();
-        mutation1.setGeneName("MET");
-        mutation1.setChromosome("8");
-        mutation1.setPosition(123456L);
-        mutation1.setReferenceAllele("A");
-        mutation1.setAlternateAllele("T");
-        mutation1.setMutationType("SNV");
-        mutation1.setPatientId("PATIENT-5");
-        mutation1.setSampleId("SAMPLE-5");
-        mutation1.setProteinChange("p.M123T");
-        mutation1.setCancerType("Lung Adenocarcinoma (TCGA)");
-        mutation1.setClinicalSignificance("Pathogenic");
-        mutation1.setAlleleFrequency(new BigDecimal("0.50"));
-
-        Mutation mutation2 = new Mutation();
-        mutation2.setGeneName("CDC6");
-        mutation2.setChromosome("8");
-        mutation2.setPosition(654321L);
-        mutation2.setReferenceAllele("G");
-        mutation2.setAlternateAllele("C");
-        mutation2.setMutationType("SNV");
-        mutation2.setPatientId("PATIENT-6");
-        mutation2.setSampleId("SAMPLE-6");
-        mutation2.setProteinChange("p.M123T");
-        mutation2.setCancerType("Lung Adenocarcinoma (TCGA)");
-        mutation2.setClinicalSignificance("Pathogenic");
-        mutation2.setAlleleFrequency(new BigDecimal("0.45"));
-
-        entityManager.persistAndFlush(mutation1);
-        entityManager.persistAndFlush(mutation2);
+        Mutation mutation1 = createMutation(
+                "MET", "8", 123456L, "A", "T", "SNV",
+                "PATIENT-5", "SAMPLE-5", "p.M123T",
+                "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.50")
+        );
+        Mutation mutation2 = createMutation(
+                "CDC6", "8", 654321L, "G", "C", "SNV",
+                "PATIENT-6", "SAMPLE-6", "p.M123T",
+                "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.45")
+        );
+        persistMutation(mutation1);
+        persistMutation(mutation2);
     }
 
     @Test
@@ -337,52 +274,51 @@ class MutationRepositoryTest {
      * allele frequencies, used to set up test data for repository queries.
      */
     private void addDifferentAlleleFrequency() {
-        Mutation mutation1 = new Mutation();
-        mutation1.setGeneName("MET");
-        mutation1.setChromosome("8");
-        mutation1.setPosition(123456L);
-        mutation1.setReferenceAllele("A");
-        mutation1.setAlternateAllele("T");
-        mutation1.setMutationType("SNV");
-        mutation1.setPatientId("PATIENT-5");
-        mutation1.setSampleId("SAMPLE-5");
-        mutation1.setProteinChange("p.M123T");
-        mutation1.setCancerType("Lung Adenocarcinoma (TCGA)");
-        mutation1.setClinicalSignificance("Pathogenic");
-        mutation1.setAlleleFrequency(new BigDecimal("0.55"));
+    Mutation mutation1 = createMutation(
+        "MET", "8", 123456L, "A", "T", "SNV",
+        "PATIENT-5", "SAMPLE-5", "p.M123T",
+        "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.55")
+    );
+    Mutation mutation2 = createMutation(
+        "CDC6", "8", 654321L, "G", "C", "SNV",
+        "PATIENT-6", "SAMPLE-6", "p.M123T",
+        "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.45")
+    );
+    Mutation mutation3 = createMutation(
+        "CDC6", "7", 140453136L, "A", "T", "SNV",
+        "PATIENT-12", "SAMPLE-12", "p.V600E",
+        "Lung Adenocarcinoma (TCGA)", "Pathogenic", new BigDecimal("0.60")
+    );
+    persistMutation(mutation1);
+    persistMutation(mutation2);
+    persistMutation(mutation3);
+    }
+    /**
+     * Helper to create a Mutation with all fields set.
+     */
+    private Mutation createMutation(String geneName, String chromosome, Long position, String referenceAllele, String alternateAllele, String mutationType,
+                                    String patientId, String sampleId, String proteinChange, String cancerType, String clinicalSignificance, BigDecimal alleleFrequency) {
+        Mutation mutation = new Mutation();
+        mutation.setGeneName(geneName);
+        mutation.setChromosome(chromosome);
+        mutation.setPosition(position);
+        mutation.setReferenceAllele(referenceAllele);
+        mutation.setAlternateAllele(alternateAllele);
+        mutation.setMutationType(mutationType);
+        mutation.setPatientId(patientId);
+        mutation.setSampleId(sampleId);
+        mutation.setProteinChange(proteinChange);
+        mutation.setCancerType(cancerType);
+        mutation.setClinicalSignificance(clinicalSignificance);
+        mutation.setAlleleFrequency(alleleFrequency);
+        return mutation;
+    }
 
-        Mutation mutation2 = new Mutation();
-        mutation2.setGeneName("CDC6");
-        mutation2.setChromosome("8");
-        mutation2.setPosition(654321L);
-        mutation2.setReferenceAllele("G");
-        mutation2.setAlternateAllele("C");
-        mutation2.setMutationType("SNV");
-        mutation2.setPatientId("PATIENT-6");
-        mutation2.setSampleId("SAMPLE-6");
-        mutation2.setProteinChange("p.M123T");
-        mutation2.setCancerType("Lung Adenocarcinoma (TCGA)");
-        mutation2.setClinicalSignificance("Pathogenic");
-        mutation2.setAlleleFrequency(new BigDecimal("0.45"));
-
-
-        Mutation mutation3 = new Mutation();
-        mutation3.setGeneName("CDC6");
-        mutation3.setChromosome("7");
-        mutation3.setPosition(140453136L);
-        mutation3.setReferenceAllele("A");
-        mutation3.setAlternateAllele("T");
-        mutation3.setMutationType("SNV");
-        mutation3.setPatientId("PATIENT-12");
-        mutation3.setSampleId("SAMPLE-12");
-        mutation3.setProteinChange("p.V600E");
-        mutation3.setCancerType("Lung Adenocarcinoma (TCGA)");
-        mutation3.setClinicalSignificance("Pathogenic");
-        mutation3.setAlleleFrequency(new BigDecimal("0.60"));
-
-        entityManager.persistAndFlush(mutation1);
-        entityManager.persistAndFlush(mutation2);
-        entityManager.persistAndFlush(mutation3);
+    /**
+     * Helper to persist and flush a mutation.
+     */
+    private void persistMutation(Mutation mutation) {
+        entityManager.persistAndFlush(mutation);
     }
 
     @Test
@@ -400,8 +336,8 @@ class MutationRepositoryTest {
 
     @Test
     void findByGeneName_shouldReturnEmptyList_whenNullOrEmpty() {
-        List<Mutation> nullResult = mutationRepository.findByGeneName(null);
-        List<Mutation> emptyResult = mutationRepository.findByGeneName("");
+        List<Mutation> nullResult = mutationRepository.findByGeneNameCaseInsensitive(null);
+        List<Mutation> emptyResult = mutationRepository.findByGeneNameCaseInsensitive("");
         assertTrue(nullResult == null || nullResult.isEmpty());
         assertTrue(emptyResult.isEmpty());
     }

@@ -18,14 +18,6 @@ import java.util.List;
 @Repository
 public interface MutationRepository extends JpaRepository<Mutation, Integer> {
     /**
-     * Finds all mutations for a specific gene, case-insensitive.
-     * @param geneName HGNC gene symbol (e.g., "EGFR", "KRAS", "TP53")
-     * @return list of mutations for the gene
-     */
-    @Query("SELECT m FROM Mutation m WHERE LOWER(m.geneName) = LOWER(:geneName)")
-    List<Mutation> findByGeneName(@Param("geneName") String geneName);
-
-    /**
      * Finds all mutations for a specific gene case-insensitive.
      * @param geneName HGNC gene symbol (e.g., "EGFR", "KRAS", "TP53")
      * @return list of mutations for the gene
