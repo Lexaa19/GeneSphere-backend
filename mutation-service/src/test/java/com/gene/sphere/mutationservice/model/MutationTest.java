@@ -17,6 +17,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class MutationTest {
 
     private Validator validator;
+
+    @BeforeEach
+    void setUp() {
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
+    }
+
+
     @Test
     void testJsonSerialization() throws Exception {
         var mutation = getMutation();
@@ -42,11 +49,6 @@ class MutationTest {
         mutation.setClinicalSignificance("Pathogenic");
         mutation.setAlleleFrequency(new BigDecimal("0.6523"));
         return mutation;
-    }
-
-    @BeforeEach
-    void setUp() {
-        validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     @Test
