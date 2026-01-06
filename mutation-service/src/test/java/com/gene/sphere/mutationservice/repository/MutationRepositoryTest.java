@@ -171,7 +171,12 @@ class MutationRepositoryTest {
         assertEquals(1, result.size());
     }
 
-    void addDuplicatedChromosome() {
+    /**
+     * Helper method that persists two mutations sharing the same chromosome value.
+     * <p>
+     * Used by tests that require duplicated chromosome data to validate repository queries.
+     */
+    private void addDuplicatedChromosome() {
         Mutation mutation1 = new Mutation();
         mutation1.setGeneName("MET");
         mutation1.setChromosome("8");
