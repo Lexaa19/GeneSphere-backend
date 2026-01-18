@@ -5,11 +5,14 @@ import com.gene.sphere.geneservice.cache.RedisCacheService;
 import com.gene.sphere.geneservice.config.RedisHealthIndicator;
 import com.gene.sphere.geneservice.model.Gene;
 import com.gene.sphere.geneservice.model.GeneRecord;
+import com.gene.sphere.geneservice.security.JwtAuthenticationFilter;
+import com.gene.sphere.geneservice.security.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -28,6 +31,13 @@ class CacheControllerTest {
 
     @MockBean
     private RedisHealthIndicator redisHealthIndicator;
+    
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+    
     // MockMvc allows you to test your Spring MVC controllers without starting a real server.
     // It simulates HTTP requests and checks responses, status codes, headers, and content.
     @Autowired
@@ -87,6 +97,7 @@ class CacheControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void getGene_ShouldReturnGene_whenFoundInCache() throws Exception {
         // Arrange
         when(redisCacheService.searchGenesByPattern("TP53")).thenReturn(List.of(tp53GeneRecord));
@@ -101,6 +112,7 @@ class CacheControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void searchGenes_ShouldReturnEmptyList_WhenNoMatch() throws Exception {
         // Arrange
         when(redisCacheService.searchGenesByPattern("TPP")).thenReturn(List.of());
@@ -115,6 +127,7 @@ class CacheControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void searchGenes_ShouldReturnBadRequest_WhenPatternIsInvalid() throws Exception {
         // Arrange
         // Avoid * as it is a wildcard that matches all the possible keys in the cache.
@@ -130,6 +143,7 @@ class CacheControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void searchGenes_ShouldReturnBadRequest_WhenPatternIsNull() throws Exception {
         // Arrange
         when(redisCacheService.searchGenesByPattern("null")).thenReturn(List.of());
@@ -141,6 +155,7 @@ class CacheControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void clearGeneFromCache_ShouldSucceed_WhenGenesExistInCache() throws Exception {
         // Arrange
         when(redisCacheService.clearByPattern("gene:KRAS")).thenReturn(ClearResult.success(1L, "gene:KRAS"));
@@ -154,6 +169,7 @@ class CacheControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void clearGeneFromCache_ShouldReturnBadRequest_WhenPatternIsInvalid() throws Exception {
         mockMvc.perform(delete("/api/cache/clear?pattern=KRASS"))
                 .andExpect(status().isBadRequest())

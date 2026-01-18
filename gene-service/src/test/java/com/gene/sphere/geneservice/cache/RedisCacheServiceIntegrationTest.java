@@ -1,6 +1,9 @@
 package com.gene.sphere.geneservice.cache;
 
+import com.gene.sphere.geneservice.config.RedisHealthIndicator;
 import com.gene.sphere.geneservice.model.GeneRecord;
+import com.gene.sphere.geneservice.security.JwtAuthenticationFilter;
+import com.gene.sphere.geneservice.security.JwtTokenProvider;
 import com.gene.sphere.geneservice.service.GeneService;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -55,6 +58,16 @@ class RedisCacheServiceIntegrationTest {
 
     @MockBean
     private RLock rLock;
+    
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+    
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    
+    @MockBean
+    private RedisHealthIndicator redisHealthIndicator;
+
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
