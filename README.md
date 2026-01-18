@@ -10,6 +10,17 @@ This project is my humble endeavor to bring meaningful change to this world—by
 
 It will also contain podcasts and relevant information for people who fight this disease, offering hope, knowledge, and community support in their journey.
 
+## ⚠️ Important Notice
+
+**This application uses real, de-identified cancer genomics data from TCGA (The Cancer Genome Atlas) and other public research databases.**
+
+- ✅ **For Research & Education:** Intended for researchers, clinicians, and students
+- ❌ **Not for Clinical Use:** NOT for individual patient diagnosis or treatment decisions
+- 🔒 **Privacy Compliant:** All data is de-identified per HIPAA standards
+- 📚 **Cite Sources:** When publishing, cite TCGA and cBioPortal (see [DATA_SOURCES.md](DATA_SOURCES.md))
+
+**See [DISCLAIMER](gene-service/src/main/resources/static/disclaimer.html) for full terms of use.**
+
 
 ## 🏗️ Architecture
 
