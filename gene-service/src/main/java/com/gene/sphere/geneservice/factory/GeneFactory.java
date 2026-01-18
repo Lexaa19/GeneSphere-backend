@@ -41,18 +41,18 @@ public class GeneFactory {
      * }
      * }</pre>
      *
-     * @param g the {@link Gene} entity retrieved from the database
+     * @param gene the {@link Gene} entity retrieved from the database
      * @return a {@link GeneRecord} DTO suitable for returning to clients
      */
-    public GeneRecord toDto(Gene g) {
+    public GeneRecord toDto(Gene gene) {
         return new GeneRecord(
-                g.getName(),
-                g.getDescription(),
-                g.getNormalFunction(),
-                g.getMutationEffect(),
-                g.getPrevalence(),
-                g.getTherapies(),
-                g.getResearchLinks()
+                gene.getName(),
+                gene.getDescription(),
+                gene.getNormalFunction(),
+                gene.getMutationEffect(),
+                gene.getPrevalence(),
+                gene.getTherapies(),
+                gene.getResearchLinks()
         );
     }
 
@@ -81,14 +81,14 @@ public class GeneFactory {
      * @return a {@link Gene} entity ready for persistence
      */
     public Gene fromDto(GeneRecord dto) {
-        Gene g = new Gene();
-        g.setName(dto.name());
-        g.setDescription(dto.description());
-        g.setNormalFunction(dto.normalFunction());
-        g.setMutationEffect(dto.mutationEffect());
-        g.setPrevalence(dto.prevalence());
-        g.setTherapies(dto.therapies());
-        g.setResearchLinks(dto.researchLinks());
-        return g;
+        Gene gene = new Gene();
+        gene.setName(dto.name());
+        gene.setDescription(dto.description());
+        gene.setNormalFunction(dto.normalFunction());
+        gene.setMutationEffect(dto.mutationEffect());
+        gene.setPrevalence(dto.prevalence());
+        gene.setTherapies(dto.therapies());
+        gene.setResearchLinks(dto.researchLinks());
+        return gene;
     }
 }
