@@ -72,13 +72,13 @@ These sources are used for **clinical annotation and validation**, NOT as primar
 
 ---
 
-### De-identification
+## De-identification
 All patient data has been de-identified in accordance with:
 - HIPAA Safe Harbor Method
 - NIH Genomic Data Sharing Policy
 - No personally identifiable information (PII) included
 
-### Patient Sample IDs
+## Patient Sample IDs
 Sample IDs (e.g., `TCGA-05-4244-01`) are:
 - ✅ Anonymized codes
 - ✅ Cannot be reverse-engineered to identify individuals
