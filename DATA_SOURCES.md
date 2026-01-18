@@ -37,13 +37,13 @@ the TCGA Research Network: https://www.cancer.gov/tcga
 
 These sources are used for **clinical annotation and validation**, NOT as primary mutation data:
 
-### 2. NCBI Gene Database
+### 1. NCBI Gene Database
 - **URL:** https://www.ncbi.nlm.nih.gov/gene
 - **Usage:** Gene descriptions, normal function information
 - **Scripts:** `enrich_top_genes.py`, `fetch_lung_cancer_gene_data.py`
 - **Role:** Enriching gene metadata
 
-### 3. Manual Curation from Clinical Literature
+### 2. Manual Curation from Clinical Literature
 - **Source:** `curated_lung_cancer_genes.sql` (hand-curated)
 - **References:** NCCN Guidelines, OncoKB, COSMIC, clinical trials literature
 - **Usage:** Therapy information, prevalence statistics, clinical context
