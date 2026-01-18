@@ -19,7 +19,7 @@ It will also contain podcasts and relevant information for people who fight this
 - 🔒 **Privacy Compliant:** All data is de-identified per HIPAA standards
 - 📚 **Cite Sources:** When publishing, cite TCGA and cBioPortal (see [DATA_SOURCES.md](DATA_SOURCES.md))
 
-**See [DISCLAIMER](gene-service/src/main/resources/static/disclaimer.html) for full terms of use.**
+**See DISCLAIMER for full terms of use.**
 
 
 ## 🏗️ Architecture
