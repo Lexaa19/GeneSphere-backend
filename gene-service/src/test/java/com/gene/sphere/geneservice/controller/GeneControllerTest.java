@@ -1,8 +1,12 @@
 package com.gene.sphere.geneservice.controller;
 
 
+import com.gene.sphere.geneservice.cache.RedisCacheService;
+import com.gene.sphere.geneservice.config.RedisHealthIndicator;
 import com.gene.sphere.geneservice.model.Gene;
 import com.gene.sphere.geneservice.model.GeneRecord;
+import com.gene.sphere.geneservice.security.JwtAuthenticationFilter;
+import com.gene.sphere.geneservice.security.JwtTokenProvider;
 import com.gene.sphere.geneservice.service.GeneServiceInterface;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +37,18 @@ class GeneControllerTest {
 
     @MockBean
     private CacheManager cacheManager;
+
+    @MockBean
+    private RedisCacheService redisCacheService;
+
+    @MockBean
+    private RedisHealthIndicator redisHealthIndicator;
+    
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
 
     // test data fields
     private Gene tp53Gene;
