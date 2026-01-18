@@ -3,6 +3,7 @@ package com.gene.sphere.mutationservice.repository;
 import com.gene.sphere.mutationservice.model.Mutation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -15,28 +16,38 @@ import java.util.List;
  * <p>Data source: TCGA (The Cancer Genome Atlas) lung cancer mutation data from cBioPortal.</p>
  */
 @Repository
-public interface MutationRepository extends JpaRepository<Mutation, Long> {
-
+public interface MutationRepository extends JpaRepository<Mutation, Integer> {
     /**
-     * Finds all mutations for a specific gene.
+     * Finds all mutations for a specific gene case-insensitive.
      * @param geneName HGNC gene symbol (e.g., "EGFR", "KRAS", "TP53")
      * @return list of mutations for the gene
      */
-    List<Mutation> findByGeneName(String geneName);
+    @Query("SELECT m FROM Mutation m WHERE LOWER(m.geneName) = LOWER(:geneName)")
+    List<Mutation> findByGeneNameCaseInsensitive(@Param("geneName") String geneName);
 
     /**
-     * Finds all occurrences of a specific protein change across patients.
+     * Finds all mutations where the gene name contains the given substring, case-insensitive.
+     * @param partialGene partial or full gene symbol (e.g., "TP", "egfr")
+     * @return list of mutations with gene names containing the substring
+     */
+    @Query("SELECT m FROM Mutation m WHERE LOWER(m.geneName) LIKE LOWER(CONCAT('%', :partialGene, '%'))")
+    List<Mutation> findByGeneNameContainingIgnoreCase(@Param("partialGene") String partialGene);
+
+    /**
+     * Finds all occurrences of a specific protein change across patients, case-insensitive.
      * @param proteinChange HGVS notation (e.g., "p.L858R", "p.G12C")
      * @return list of mutations with that protein change
      */
-    List<Mutation> findByProteinChange(String proteinChange);
+    @Query("SELECT m FROM Mutation m WHERE LOWER(m.proteinChange) = LOWER(:proteinChange)")
+    List<Mutation> findByProteinChange(@Param("proteinChange") String proteinChange);
 
     /**
-     * Finds all mutations for a cancer type.
-     * @param cancerType cancer type (e.g., "Lung Adenocarcinoma (TCGA)")
-     * @return list of mutations for that cancer type
+     * Finds all mutations where the cancer type contains the given substring, case-insensitive.
+     * @param partialCancerType partial or full cancer type string (e.g., "lung", "adenocarcinoma")
+     * @return list of mutations with cancer types containing the substring
      */
-    List<Mutation> findByCancerType(String cancerType);
+    @Query("SELECT m FROM Mutation m WHERE LOWER(m.cancerType) LIKE LOWER(CONCAT('%', :partialCancerType, '%'))")
+    List<Mutation> findByCancerTypeContainingIgnoreCase(@Param("partialCancerType") String partialCancerType);
 
     /**
      * Finds all mutations for a specific patient.
@@ -46,19 +57,22 @@ public interface MutationRepository extends JpaRepository<Mutation, Long> {
     List<Mutation> findByPatientId(String patientId);
 
     /**
-     * Finds mutations by clinical significance.
+     * Finds mutations by clinical significance, case-insensitive.
      * @param significance clinical classification (e.g., "Pathogenic", "Likely Pathogenic")
      * @return list of mutations with that significance
      */
-    List<Mutation> findByClinicalSignificance(String significance);
+    @Query("SELECT m FROM Mutation m WHERE LOWER(m.clinicalSignificance) = LOWER(:significance)")
+    List<Mutation> findByClinicalSignificance(@Param("significance") String significance);
+
 
     /**
-     * Finds pathogenic/actionable mutations in a specific gene.
+     * Finds pathogenic/actionable mutations in a specific gene, case-insensitive for both fields.
      * @param geneName gene symbol
      * @param significance clinical significance
      * @return list of clinically significant mutations in the gene
      */
-    List<Mutation> findByGeneNameAndClinicalSignificance(String geneName, String significance);
+    @Query("SELECT m FROM Mutation m WHERE LOWER(m.geneName) = LOWER(:geneName) AND LOWER(m.clinicalSignificance) = LOWER(:significance)")
+    List<Mutation> findByGeneNameAndClinicalSignificance(@Param("geneName") String geneName, @Param("significance") String significance);
 
     /**
      * Finds high-confidence mutations (high allele frequency) in a gene.
@@ -105,7 +119,8 @@ public interface MutationRepository extends JpaRepository<Mutation, Long> {
      * @param proteinChange protein change (e.g., "p.L858R")
      * @return true if mutation exists
      */
-    boolean existsByGeneNameAndProteinChange(String geneName, String proteinChange);
+    @Query("SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM Mutation m WHERE LOWER(m.geneName) = LOWER(:geneName) AND LOWER(m.proteinChange) = LOWER(:proteinChange)")
+    boolean existsByGeneNameAndProteinChange(@Param("geneName") String geneName, @Param("proteinChange") String proteinChange);
 
     /**
      * Finds all mutations on a specific chromosome.
