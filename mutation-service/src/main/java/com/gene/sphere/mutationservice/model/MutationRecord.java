@@ -20,7 +20,7 @@ import java.math.BigDecimal;
  */
 public record MutationRecord(
 
-        String name,
+        String geneName,
         String chromosome,
         Long position,
         String referenceAllele,
