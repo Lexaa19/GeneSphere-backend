@@ -40,7 +40,7 @@ public class MutationFactory {
      */
     public Mutation fromDto(MutationRecord mutationDto) {
         Mutation mutation = new Mutation();
-        mutation.setGeneName(mutationDto.name());
+        mutation.setGeneName(mutationDto.geneName());
         mutation.setChromosome(mutationDto.chromosome());
         mutation.setPosition(mutationDto.position());
         mutation.setReferenceAllele(mutationDto.referenceAllele());
