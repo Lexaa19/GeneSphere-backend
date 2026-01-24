@@ -172,8 +172,9 @@ class MutationRecordTest {
         );
     }
 
+
     @Test
-    void shouldThrowException_whenPatientIdTypeIsNull() {
+    void shouldThrowException_whenPatientIdIsNull() {
         assertThrows(IllegalArgumentException.class, () ->
                 new MutationDto(
                         "TP53",
@@ -186,7 +187,7 @@ class MutationRecordTest {
     }
 
     @Test
-    void shouldThrowException_whenPatientIdTypeIsEmpty() {
+    void shouldThrowException_whenPatientIdIsEmpty() {
         assertThrows(IllegalArgumentException.class, () ->
                 new MutationDto(
                         "TP53",
