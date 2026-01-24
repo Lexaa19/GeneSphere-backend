@@ -4,8 +4,6 @@ import com.gene.sphere.mutationservice.model.Mutation;
 import com.gene.sphere.mutationservice.model.MutationDto;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 /**
  * Factory for converting between Mutation entity and MutationDto (API request/response DTO).
  *
@@ -20,25 +18,27 @@ public class MutationFactory {
      * Converts a Mutation entity to a MutationDto for API responses.
      *
      * @param mutation the entity from the database
-     * @return immutable DTO for API (used in both requests and responses)
+     * @return immutable DTO for API (used in both requests and responses), or null if input is null
      */
     public MutationDto toDto(Mutation mutation) {
-        return Optional.ofNullable(mutation)
-                .map(m -> new MutationDto(
-                        m.getGeneName(),
-                        m.getChromosome(),
-                        m.getPosition(),
-                        m.getReferenceAllele(),
-                        m.getAlternateAllele(),
-                        m.getMutationType(),
-                        m.getPatientId(),
-                        m.getSampleId(),
-                        m.getProteinChange(),
-                        m.getCancerType(),
-                        m.getClinicalSignificance(),
-                        m.getAlleleFrequency()
-                ))
-                .orElse(null);
+        if (mutation == null) {
+            return null;
+        }
+        
+        return new MutationDto(
+                mutation.getGeneName(),
+                mutation.getChromosome(),
+                mutation.getPosition(),
+                mutation.getReferenceAllele(),
+                mutation.getAlternateAllele(),
+                mutation.getMutationType(),
+                mutation.getPatientId(),
+                mutation.getSampleId(),
+                mutation.getProteinChange(),
+                mutation.getCancerType(),
+                mutation.getClinicalSignificance(),
+                mutation.getAlleleFrequency()
+        );
     }
 
 
@@ -46,27 +46,27 @@ public class MutationFactory {
      * Converts a MutationDto (from API request or response) to a Mutation entity for persistence.
      *
      * @param mutationDto the DTO from API request or response
-     * @return entity ready for database
+     * @return entity ready for database, or null if input is null
      */
     public Mutation fromDto(MutationDto mutationDto) {
-        return Optional.ofNullable(mutationDto)
-                .map(dto -> {
-                    Mutation mutation = new Mutation();
-                    mutation.setGeneName(dto.geneName());
-                    mutation.setChromosome(dto.chromosome());
-                    mutation.setPosition(dto.position());
-                    mutation.setReferenceAllele(dto.referenceAllele());
-                    mutation.setAlternateAllele(dto.alternateAllele());
-                    mutation.setMutationType(dto.mutationType());
-                    mutation.setPatientId(dto.patientId());
-                    mutation.setSampleId(dto.sampleId());
-                    mutation.setProteinChange(dto.proteinChange());
-                    mutation.setCancerType(dto.cancerType());
-                    mutation.setClinicalSignificance(dto.clinicalSignificance());
-                    mutation.setAlleleFrequency(dto.alleleFrequency());
-                    return mutation;
-                })
-                .orElse(null);
+        if (mutationDto == null) {
+            return null;
+        }
+        
+        Mutation mutation = new Mutation();
+        mutation.setGeneName(mutationDto.geneName());
+        mutation.setChromosome(mutationDto.chromosome());
+        mutation.setPosition(mutationDto.position());
+        mutation.setReferenceAllele(mutationDto.referenceAllele());
+        mutation.setAlternateAllele(mutationDto.alternateAllele());
+        mutation.setMutationType(mutationDto.mutationType());
+        mutation.setPatientId(mutationDto.patientId());
+        mutation.setSampleId(mutationDto.sampleId());
+        mutation.setProteinChange(mutationDto.proteinChange());
+        mutation.setCancerType(mutationDto.cancerType());
+        mutation.setClinicalSignificance(mutationDto.clinicalSignificance());
+        mutation.setAlleleFrequency(mutationDto.alleleFrequency());
+        return mutation;
     }
 
 }
