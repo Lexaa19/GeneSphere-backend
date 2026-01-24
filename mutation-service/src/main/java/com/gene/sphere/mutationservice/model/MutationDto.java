@@ -18,7 +18,7 @@ import java.math.BigDecimal;
  * @param clinicalSignificance Clinical impact (e.g., "Pathogenic", "Benign")
  * @param alleleFrequency      Frequency of the alternate allele (0.0 to 1.0)
  */
-public record MutationRecord(
+public record MutationDto(
 
         String geneName,
         String chromosome,
@@ -34,7 +34,7 @@ public record MutationRecord(
         BigDecimal alleleFrequency
 
 ) {
-    public MutationRecord {
+    public MutationDto {
         if (geneName == null || geneName.isBlank()) {
             throw new IllegalArgumentException("Gene name cannot be null");
         }

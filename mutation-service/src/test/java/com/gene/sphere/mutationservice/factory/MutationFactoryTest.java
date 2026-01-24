@@ -1,7 +1,7 @@
 package com.gene.sphere.mutationservice.factory;
 
 import com.gene.sphere.mutationservice.model.Mutation;
-import com.gene.sphere.mutationservice.model.MutationRecord;
+import com.gene.sphere.mutationservice.model.MutationDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ class MutationFactoryTest {
         mutation.setAlleleFrequency(new BigDecimal("0.45"));
 
         // ACT: Convert to DTO
-        MutationRecord dto = mutationFactory.toDto(mutation);
+        MutationDto dto = mutationFactory.toDto(mutation);
 
         // ASSERT: Check ALL 12 fields are mapped correctly
         assertNotNull(dto, "DTO should not be null");
@@ -57,7 +57,7 @@ class MutationFactoryTest {
     @Test
     void fromDto_shouldMapAllFields_whenGivenValidDto() {
         // ARRANGE: Create DTO with all fields
-        MutationRecord dto = new MutationRecord(
+        MutationDto dto = new MutationDto(
                 "TP53", "17", 7579472L, "C", "T", "SNV",
                 "PATIENT_001", "TCGA-05-4244-01",
                 "p.R273H",
@@ -104,7 +104,7 @@ class MutationFactoryTest {
         mutation.setAlleleFrequency(new BigDecimal("0.45"));
 
         // ACT: Convert entity to DTO
-        MutationRecord dto = mutationFactory.toDto(mutation);
+        MutationDto dto = mutationFactory.toDto(mutation);
 
         // ASSERT: Null fields should remain null in DTO
         assertNotNull(dto, "DTO should not be null");
@@ -120,7 +120,7 @@ class MutationFactoryTest {
     @Test
     void fromDto_shouldHandleNullOptionalFields_whenGivenPartialDto() {
         // ARRANGE: Create DTO with null optional fields
-        MutationRecord dto = new MutationRecord(
+        MutationDto dto = new MutationDto(
                 "TP53", "17", 7579472L, "C", "T", "SNV",
                 "PATIENT_001", "TCGA-05-4244-01",
                 null,  // proteinChange can be null
@@ -159,7 +159,7 @@ class MutationFactoryTest {
         original.setAlleleFrequency(new BigDecimal("0.45"));
 
         // ACT: Entity → DTO → Entity (round trip)
-        MutationRecord dto = mutationFactory.toDto(original);
+        MutationDto dto = mutationFactory.toDto(original);
         Mutation result = mutationFactory.fromDto(dto);
 
         // ASSERT
@@ -180,7 +180,7 @@ class MutationFactoryTest {
 
     @Test
     void toDto_shouldReturnNull_whenGivenNullEntity() {
-        MutationRecord toDto = mutationFactory.toDto(null);
+        MutationDto toDto = mutationFactory.toDto(null);
         assertNull(toDto, "Should return null when given null entity");
     }
 
@@ -192,7 +192,7 @@ class MutationFactoryTest {
 
     @Test
     void shouldHandleVeryLargePosition() {
-        MutationRecord record = new MutationRecord(
+        MutationDto record = new MutationDto(
                 "TP53", "17", Long.MAX_VALUE, "C", "T", "SNV",
                 "PATIENT_001", "TCGA-05-4244-01",
                 "p.R273H",
@@ -209,7 +209,7 @@ class MutationFactoryTest {
 
     @Test
     void shouldHandleZeroAndMaxAlleleFrequency() {
-        MutationRecord maxRecord = new MutationRecord(
+        MutationDto maxRecord = new MutationDto(
                 "TP53", "17", Long.MAX_VALUE, "C", "T", "SNV",
                 "PATIENT_001", "TCGA-05-4244-01",
                 "p.R273H",
@@ -221,7 +221,7 @@ class MutationFactoryTest {
         assertNotNull(maxFromDto);
         assertEquals(0, maxFromDto.getAlleleFrequency().compareTo(maxRecord.alleleFrequency()), "Allele frequency should be preserved");
 
-        MutationRecord minRecord = new MutationRecord(
+        MutationDto minRecord = new MutationDto(
                 "TP53", "17", Long.MAX_VALUE, "C", "T", "SNV",
                 "PATIENT_001", "TCGA-05-4244-01",
                 "p.R273H",
@@ -244,10 +244,10 @@ class MutationFactoryTest {
         mutation.setPatientId("PATIENT_001");
         mutation.setCancerType("Lung Adenocarcinoma");
 
-        MutationRecord toDto = mutationFactory.toDto(mutation);
+        MutationDto toDto = mutationFactory.toDto(mutation);
         assertNotNull(toDto);
         assertThrows(NoSuchMethodException.class, () -> {
-            MutationRecord.class.getDeclaredMethod("id");
+            MutationDto.class.getDeclaredMethod("id");
         });
     }
 

@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MutationRecordTest {
 
-    private static MutationRecord getMutationRecord() {
+    private static MutationDto getMutationRecord() {
         // ARRANGE: Prepare test data
         var geneName = "TP53";
         var chromosome = "17";
@@ -25,7 +25,7 @@ class MutationRecordTest {
 
 
         // ACT - create the record
-        MutationRecord record = new MutationRecord(
+        MutationDto record = new MutationDto(
                 geneName,
                 chromosome,
                 position,
@@ -45,7 +45,7 @@ class MutationRecordTest {
     @Test
     void shouldCreateMutationRecord_withAllFields() {
 
-        MutationRecord record = getMutationRecord();
+        MutationDto record = getMutationRecord();
 
         assertNotNull(record);
         assertEquals("TP53", record.geneName());
@@ -65,7 +65,7 @@ class MutationRecordTest {
     @Test
     void shouldBeEqual_whenRecordsHaveSameData() {
         // ARRANGE: Create two identical records
-        MutationRecord record1 = new MutationRecord(
+        MutationDto record1 = new MutationDto(
                 "TP53", "17", 7579472L, "C", "T", "SNV",
                 "P001", "TCGA-05-4244-01", "p.R273H",
                 "Lung Adenocarcinoma", "Pathogenic",
@@ -73,7 +73,7 @@ class MutationRecordTest {
         );
 
 
-        MutationRecord record2 = new MutationRecord(
+        MutationDto record2 = new MutationDto(
                 "TP53", "17", 7579472L, "C", "T", "SNV",
                 "P001", "TCGA-05-4244-01", "p.R273H",
                 "Lung Adenocarcinoma", "Pathogenic",
@@ -87,7 +87,7 @@ class MutationRecordTest {
     @Test
     void shouldNotBeEqual_whenRecordsHaveDifferentData() {
 
-        MutationRecord record1 = new MutationRecord(
+        MutationDto record1 = new MutationDto(
                 "TP53", "17", 7579472L, "C", "T", "SNV",
                 "P001", "TCGA-05-4244-01", "p.R273H",
                 "Lung Adenocarcinoma", "Pathogenic",
@@ -95,7 +95,7 @@ class MutationRecordTest {
         );
 
 
-        MutationRecord record2 = new MutationRecord(
+        MutationDto record2 = new MutationDto(
                 "TP53", "18", 7579472L, "C", "T", "SNV",
                 "P011", "TCGA-05-4244-11", "p.R273H",
                 "Lung Adenocarcinoma", "Pathogenic",
@@ -107,7 +107,7 @@ class MutationRecordTest {
 
     @Test
     void shouldAllowNullOptionalFields() {
-        var record = new MutationRecord(
+        var record = new MutationDto(
                 "TP53", "17", 7579472L, "C", "T", "SNV",
                 "P001", "TCGA-05-4244-01",
                 null,  // proteinChange can be null
@@ -122,7 +122,7 @@ class MutationRecordTest {
     @Test
     void shouldThrowException_whenMandatoryGeneNameIsNull() {
         assertThrows(IllegalArgumentException.class, () ->
-                new MutationRecord(
+                new MutationDto(
                         null,  // geneName is mandatory
                         "17", 7579472L, "C", "T", "SNV",
                         "P001", "TCGA-05-4244-01", "p.R273H",
@@ -136,7 +136,7 @@ class MutationRecordTest {
     @Test
     void shouldThrowException_whenGeneNameIsBlank() {
         assertThrows(IllegalArgumentException.class, () ->
-                new MutationRecord(
+                new MutationDto(
                         "",
                         "17", 7579472L, "C", "T", "SNV",
                         "P001", "TCGA-05-4244-01", "p.R273H",
@@ -149,7 +149,7 @@ class MutationRecordTest {
     @Test
     void shouldThrowException_whenMutationTypeIsNull() {
         assertThrows(IllegalArgumentException.class, () ->
-                new MutationRecord(
+                new MutationDto(
                         "TP53",
                         "17", 7579472L, "C", "T", null,
                         "P001", "TCGA-05-4244-01", "p.R273H",
@@ -162,7 +162,7 @@ class MutationRecordTest {
     @Test
     void shouldThrowException_whenMutationTypeIsBlank() {
         assertThrows(IllegalArgumentException.class, () ->
-                new MutationRecord(
+                new MutationDto(
                         "TP53",
                         "17", 7579472L, "C", "T", "",
                         "P001", "TCGA-05-4244-01", "p.R273H",
@@ -175,7 +175,7 @@ class MutationRecordTest {
     @Test
     void shouldThrowException_whenPatientIdTypeIsNull() {
         assertThrows(IllegalArgumentException.class, () ->
-                new MutationRecord(
+                new MutationDto(
                         "TP53",
                         "17", 7579472L, "C", "T", "SNV",
                         null, "TCGA-05-4244-01", "p.R273H",
@@ -188,7 +188,7 @@ class MutationRecordTest {
     @Test
     void shouldThrowException_whenPatientIdTypeIsEmpty() {
         assertThrows(IllegalArgumentException.class, () ->
-                new MutationRecord(
+                new MutationDto(
                         "TP53",
                         "17", 7579472L, "C", "T", "SNV",
                         "", "TCGA-05-4244-01", "p.R273H",
@@ -201,7 +201,7 @@ class MutationRecordTest {
     @Test
     void shouldThrowException_whenCancerTypeIsNull() {
         assertThrows(IllegalArgumentException.class, () ->
-                new MutationRecord(
+                new MutationDto(
                         "TP53",
                         "17", 7579472L, "C", "T", "SNV",
                         "111", "TCGA-05-4244-01", "p.R273H",
@@ -214,7 +214,7 @@ class MutationRecordTest {
     @Test
     void shouldThrowException_whenCancerTypeIsEmpty() {
         assertThrows(IllegalArgumentException.class, () ->
-                new MutationRecord(
+                new MutationDto(
                         "TP53",
                         "17", 7579472L, "C", "T", "SNV",
                         "1111", "TCGA-05-4244-01", "p.R273H",
@@ -237,7 +237,7 @@ class MutationRecordTest {
 
     @Test
     void shouldAcceptLargePositionNumber() {
-        var record = new MutationRecord(
+        var record = new MutationDto(
                 "TP53", "17",
                 999999999L,  // Very large position
                 "C", "T", "SNV",
