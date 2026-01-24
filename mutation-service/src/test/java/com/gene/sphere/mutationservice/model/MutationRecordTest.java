@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MutationRecordTest {
+class MutationDtoTest {
 
     private static MutationDto getMutationRecord() {
         // ARRANGE: Prepare test data

@@ -36,16 +36,28 @@ public record MutationDto(
 ) {
     public MutationDto {
         if (geneName == null || geneName.isBlank()) {
-            throw new IllegalArgumentException("Gene name cannot be null");
+            throw new IllegalArgumentException("Gene name cannot be null or blank");
+        }
+        if (chromosome == null || chromosome.isBlank()) {
+            throw new IllegalArgumentException("Chromosome cannot be null or blank");
+        }
+        if (position == null) {
+            throw new IllegalArgumentException("Position cannot be null");
+        }
+        if (referenceAllele == null || referenceAllele.isBlank()) {
+            throw new IllegalArgumentException("Reference allele cannot be null or blank");
+        }
+        if (alternateAllele == null || alternateAllele.isBlank()) {
+            throw new IllegalArgumentException("Alternate allele cannot be null or blank");
         }
         if (mutationType == null || mutationType.isBlank()) {
-            throw new IllegalArgumentException("Mutation type cannot be null");
+            throw new IllegalArgumentException("Mutation type cannot be null or blank");
         }
         if (patientId == null || patientId.isBlank()) {
-            throw new IllegalArgumentException("Patient id cannot be null");
+            throw new IllegalArgumentException("Patient id cannot be null or blank");
         }
         if (cancerType == null || cancerType.isBlank()) {
-            throw new IllegalArgumentException("Cancer type cannot be null");
+            throw new IllegalArgumentException("Cancer type cannot be null or blank");
         }
     }
 }
