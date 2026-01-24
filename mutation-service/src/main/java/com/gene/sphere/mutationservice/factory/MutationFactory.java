@@ -17,8 +17,8 @@ public class MutationFactory {
     /**
      * Converts a Mutation entity to a MutationDto for API responses.
      *
-     * @param mutation the entity from the database
-     * @return immutable DTO for API (used in both requests and responses), or null if input is null
+     * @param mutation the entity from the database (may be null)
+     * @return immutable DTO for API (used in both requests and responses), or {@code null} if input is {@code null}
      */
     public MutationDto toDto(Mutation mutation) {
         if (mutation == null) {
@@ -45,8 +45,8 @@ public class MutationFactory {
     /**
      * Converts a MutationDto (from API request or response) to a Mutation entity for persistence.
      *
-     * @param mutationDto the DTO from API request or response
-     * @return entity ready for database, or null if input is null
+     * @param mutationDto the DTO from API request or response (may be null)
+     * @return entity ready for database, or {@code null} if input is {@code null}
      */
     public Mutation fromDto(MutationDto mutationDto) {
         if (mutationDto == null) {
