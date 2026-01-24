@@ -243,6 +243,11 @@ class MutationFactoryTest {
         mutation.setMutationType("SNV");
         mutation.setPatientId("PATIENT_001");
         mutation.setCancerType("Lung Adenocarcinoma");
+        // Populate required fields so MutationDto canonical constructor does not throw
+        mutation.setChromosome("17");
+        mutation.setPosition(123456L);
+        mutation.setReferenceAllele("C");
+        mutation.setAlternateAllele("T");
 
         MutationDto toDto = mutationFactory.toDto(mutation);
         assertNotNull(toDto);
