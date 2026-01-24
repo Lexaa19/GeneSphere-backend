@@ -16,7 +16,7 @@ import java.math.BigDecimal;
  * @param proteinChange        Protein-level change (e.g., "p.R273H")
  * @param cancerType           Cancer type (e.g., "Lung Adenocarcinoma")
  * @param clinicalSignificance Clinical impact (e.g., "Pathogenic", "Benign")
- * @param alleleFrequency      Frequency of the alternate allele (0.0 to 1.0)
+ * @param alleleFrequency      Frequency of the alternate allele (0.0 to 1.0, may be null if unknown)
  */
 public record MutationDto(
 
@@ -58,6 +58,11 @@ public record MutationDto(
         }
         if (cancerType == null || cancerType.isBlank()) {
             throw new IllegalArgumentException("Cancer type cannot be null or blank");
+        }
+        if (alleleFrequency != null) {
+            if (alleleFrequency.compareTo(BigDecimal.ZERO) < 0 || alleleFrequency.compareTo(BigDecimal.ONE) > 0) {
+                throw new IllegalArgumentException("Allele frequency must be between 0.0 and 1.0 (inclusive)");
+            }
         }
     }
 }
