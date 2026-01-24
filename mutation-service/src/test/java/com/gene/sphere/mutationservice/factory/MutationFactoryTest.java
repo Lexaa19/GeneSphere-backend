@@ -237,23 +237,34 @@ class MutationFactoryTest {
 
     @Test
     void toDto_shouldNotExposeEntityId() {
+        // ARRANGE: Create entity with database ID (internal implementation detail)
         Mutation mutation = new Mutation();
-        mutation.setId(123);
+        mutation.setId(123);  // This is the database ID that should NOT be exposed
         mutation.setGeneName("TP53");
-        mutation.setMutationType("SNV");
-        mutation.setPatientId("PATIENT_001");
-        mutation.setCancerType("Lung Adenocarcinoma");
-        // Populate required fields so MutationDto canonical constructor does not throw
         mutation.setChromosome("17");
         mutation.setPosition(123456L);
         mutation.setReferenceAllele("C");
         mutation.setAlternateAllele("T");
+        mutation.setMutationType("SNV");
+        mutation.setPatientId("PATIENT_001");
+        mutation.setSampleId("SAMPLE_001");
+        mutation.setCancerType("Lung Adenocarcinoma");
+        mutation.setAlleleFrequency(new BigDecimal("0.5"));
 
-        MutationDto toDto = mutationFactory.toDto(mutation);
-        assertNotNull(toDto);
+        // ACT: Convert to DTO
+        MutationDto dto = mutationFactory.toDto(mutation);
+
+        // ASSERT: DTO should not have an id field/method
+        // This is verified at compile-time because MutationDto record has no id field
+        // We use reflection here to programmatically verify this design decision
+        assertNotNull(dto, "DTO should not be null");
         assertThrows(NoSuchMethodException.class, () -> {
             MutationDto.class.getDeclaredMethod("id");
-        });
+        }, "MutationDto should not expose entity ID - this verifies our DTO does not leak database internals");
+        
+        // Also verify that the entity DOES have the ID (for comparison)
+        assertNotNull(mutation.getId(), "Entity should have ID");
+        assertEquals(123, mutation.getId(), "Entity ID should be set");
     }
 
 }
