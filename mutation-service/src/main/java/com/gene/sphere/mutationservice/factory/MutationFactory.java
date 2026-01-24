@@ -4,6 +4,8 @@ import com.gene.sphere.mutationservice.model.Mutation;
 import com.gene.sphere.mutationservice.model.MutationRecord;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 /**
  * Factory for converting between Mutation entity and MutationRecord DTO.
  */
@@ -17,20 +19,24 @@ public class MutationFactory {
      * @return immutable DTO for API
      */
     public MutationRecord toDto(Mutation mutation) {
-        return new MutationRecord(
-                mutation.getGeneName(),
-                mutation.getChromosome(),
-                mutation.getPosition(),
-                mutation.getReferenceAllele(),
-                mutation.getAlternateAllele(),
-                mutation.getMutationType(),
-                mutation.getPatientId(),
-                mutation.getSampleId(),
-                mutation.getProteinChange(),
-                mutation.getCancerType(),
-                mutation.getClinicalSignificance(),
-                mutation.getAlleleFrequency());
+        return Optional.ofNullable(mutation)
+                .map(m -> new MutationRecord(
+                        m.getGeneName(),
+                        m.getChromosome(),
+                        m.getPosition(),
+                        m.getReferenceAllele(),
+                        m.getAlternateAllele(),
+                        m.getMutationType(),
+                        m.getPatientId(),
+                        m.getSampleId(),
+                        m.getProteinChange(),
+                        m.getCancerType(),
+                        m.getClinicalSignificance(),
+                        m.getAlleleFrequency()
+                ))
+                .orElse(null);
     }
+
 
     /**
      * Converts a MutationRecord DTO to a Mutation entity for persistence.
@@ -39,20 +45,24 @@ public class MutationFactory {
      * @return entity ready for database
      */
     public Mutation fromDto(MutationRecord mutationDto) {
-        Mutation mutation = new Mutation();
-        mutation.setGeneName(mutationDto.geneName());
-        mutation.setChromosome(mutationDto.chromosome());
-        mutation.setPosition(mutationDto.position());
-        mutation.setReferenceAllele(mutationDto.referenceAllele());
-        mutation.setAlternateAllele(mutationDto.alternateAllele());
-        mutation.setMutationType(mutationDto.mutationType());
-        mutation.setPatientId(mutationDto.patientId());
-        mutation.setSampleId(mutationDto.sampleId());
-        mutation.setProteinChange(mutationDto.proteinChange());
-        mutation.setCancerType(mutationDto.cancerType());
-        mutation.setClinicalSignificance(mutationDto.clinicalSignificance());
-        mutation.setAlleleFrequency(mutationDto.alleleFrequency());
-        return mutation;
+        return Optional.ofNullable(mutationDto)
+                .map(dto -> {
+                    Mutation mutation = new Mutation();
+                    mutation.setGeneName(dto.geneName());
+                    mutation.setChromosome(dto.chromosome());
+                    mutation.setPosition(dto.position());
+                    mutation.setReferenceAllele(dto.referenceAllele());
+                    mutation.setAlternateAllele(dto.alternateAllele());
+                    mutation.setMutationType(dto.mutationType());
+                    mutation.setPatientId(dto.patientId());
+                    mutation.setSampleId(dto.sampleId());
+                    mutation.setProteinChange(dto.proteinChange());
+                    mutation.setCancerType(dto.cancerType());
+                    mutation.setClinicalSignificance(dto.clinicalSignificance());
+                    mutation.setAlleleFrequency(dto.alleleFrequency());
+                    return mutation;
+                })
+                .orElse(null);
     }
 
 }
