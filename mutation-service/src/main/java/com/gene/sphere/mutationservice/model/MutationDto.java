@@ -54,7 +54,7 @@ public record MutationDto(
             throw new IllegalArgumentException("Mutation type cannot be null or blank");
         }
         if (patientId == null || patientId.isBlank()) {
-            throw new IllegalArgumentException("Patient id cannot be null or blank");
+            throw new IllegalArgumentException("Patient ID cannot be null or blank");
         }
         if (cancerType == null || cancerType.isBlank()) {
             throw new IllegalArgumentException("Cancer type cannot be null or blank");
