@@ -187,7 +187,7 @@ class MutationFactoryTest {
     @Test
     void fromDto_shouldReturnNull_whenGivenNullDto() {
         Mutation fromDto = mutationFactory.fromDto(null);
-        assertNull(fromDto, "Should return null when given null entity");
+        assertNull(fromDto, "Should return null when given null DTO");
     }
 
     @Test
