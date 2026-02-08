@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MutationDtoTest {
 
-    private static MutationDto getMutationRecord() {
+    private static MutationDto getMutationDto() {
         // ARRANGE: Prepare test data
         var geneName = "TP53";
         var chromosome = "17";
@@ -45,7 +45,7 @@ class MutationDtoTest {
     @Test
     void shouldCreateMutationRecord_withAllFields() {
 
-        MutationDto record = getMutationRecord();
+        MutationDto record = getMutationDto();
 
         assertNotNull(record);
         assertEquals("TP53", record.geneName());
@@ -227,7 +227,7 @@ class MutationDtoTest {
 
     @Test
     void shouldGenerateReadableString_whenCallingToString() {
-        var record = getMutationRecord();
+        var record = getMutationDto();
         var result = record.toString();
 
         assertNotNull(result);
@@ -249,4 +249,28 @@ class MutationDtoTest {
 
         assertEquals(999999999L, record.position());
     }
+
+    @Test
+    void shouldThrowException_whenAlleleFrequencyIsNegative() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new MutationDto(
+                        "TP53", "17", 7579472L, "C", "T", "SNV",
+                        "P001", "TCGA-05-4244-01", "p.R273H",
+                        "Lung Adenocarcinoma", "Pathogenic",
+                        new BigDecimal("-0.1")  // Negative - should be rejected
+                )
+        );
+    }
+
+    @Test
+    void shouldThrowException_whenAlleFrequencyIsGreaterThanOne(){
+        assertThrows (IllegalArgumentException.class, () ->
+                new MutationDto("TP53", "17", 7579472L, "C", "T", "SNV",
+                        "P001", "TCGA-05-4244-01", "p.R273H",
+                        "Lung Adenocarcinoma", "Pathogenic",
+                        new BigDecimal("2")
+                        )
+        );
+    }
+
 }
