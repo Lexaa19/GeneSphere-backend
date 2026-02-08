@@ -32,7 +32,9 @@ class ClearResultTest {
         ClearResult clearResult = ClearResult.failure("gene:*", "Connection timeout");
         assertFalse(clearResult.isSuccessful());
         assertThat(clearResult.deletedCount(), equalTo(0L));
-        assertTrue(clearResult.message().contains("Failed to clear") || clearResult.message().contains("Connection timeout"));
+        String message = clearResult.message();
+        assertTrue(message.contains("Failed to clear"));
+        assertTrue(message.contains("Connection timeout"));
         assertThat(clearResult.pattern(), equalTo("gene:*"));
     }
 
