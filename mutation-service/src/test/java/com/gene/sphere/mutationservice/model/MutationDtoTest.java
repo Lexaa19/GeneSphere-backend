@@ -263,7 +263,7 @@ class MutationDtoTest {
     }
 
     @Test
-    void shouldThrowException_whenAlleFrequencyIsGreaterThanOne(){
+    void shouldThrowException_whenAlleleFrequencyIsGreaterThanOne(){
         assertThrows (IllegalArgumentException.class, () ->
                 new MutationDto("TP53", "17", 7579472L, "C", "T", "SNV",
                         "P001", "TCGA-05-4244-01", "p.R273H",
