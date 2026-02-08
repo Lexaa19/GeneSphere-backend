@@ -3,7 +3,7 @@ package com.gene.sphere.mutationservice.model;
 import java.math.BigDecimal;
 
 /**
- * Immutable DTO returned in API responses (never expose JPA Entity directly).
+ * Immutable DTO used in API requests and responses (never expose JPA Entity directly).
  *
  * @param geneName             Gene name (e.g., "TP53", "EGFR")
  * @param chromosome           Chromosome identifier (e.g., "17", "X")
