@@ -16,7 +16,7 @@ class ClearResultTest {
         assertThat(success.deletedCount(), equalTo(150L));
         assertThat(success.pattern(), equalTo("gene*"));
         assertThat(success.message(), equalTo("Successfully cleared 150 cache entries matching pattern 'gene*'"));
-        assertNotNull(success.timestamp());
+        assertTrue(success.timestamp() > 0L);
     }
 
     @Test
