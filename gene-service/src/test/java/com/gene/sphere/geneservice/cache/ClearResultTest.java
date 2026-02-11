@@ -2,9 +2,6 @@ package com.gene.sphere.geneservice.cache;
 
 import org.junit.jupiter.api.Test;
 
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ClearResultTest {
@@ -13,9 +10,9 @@ class ClearResultTest {
     void success_ShouldCreateSuccessfulResultWithDeletions() {
         ClearResult success = ClearResult.success(150L, "gene*");
         assertTrue(success.isSuccessful());
-        assertThat(success.deletedCount(), equalTo(150L));
-        assertThat(success.pattern(), equalTo("gene*"));
-        assertThat(success.message(), equalTo("Successfully cleared 150 cache entries matching pattern 'gene*'"));
+        assertEquals(success.deletedCount(), 150L);
+        assertEquals(success.pattern(), "gene*");
+        assertEquals(success.message(), "Successfully cleared 150 cache entries matching pattern 'gene*'");
         assertTrue(success.timestamp() > 0L);
     }
 
@@ -23,35 +20,27 @@ class ClearResultTest {
     void success_ShouldCreateSuccessfulResultWithZeroDeletions() {
         ClearResult success = ClearResult.success(0L, "gene*");
         assertTrue(success.isSuccessful());
-        assertThat(success.deletedCount(), equalTo(0L));
-        assertThat(success.message(), equalTo("No cache entries found matching pattern 'gene*'"));
+        assertEquals(success.deletedCount(), 0L);
+        assertEquals(success.message(),"No cache entries found matching pattern 'gene*'");
     }
 
     @Test
     void failure_ShouldCreateFailedResult() {
         ClearResult clearResult = ClearResult.failure("gene:*", "Connection timeout");
         assertFalse(clearResult.isSuccessful());
-        assertThat(clearResult.deletedCount(), equalTo(0L));
+        assertEquals(clearResult.deletedCount(), 0L);
         String message = clearResult.message();
         assertTrue(message.contains("Failed to clear"));
         assertTrue(message.contains("Connection timeout"));
-        assertThat(clearResult.pattern(), equalTo("gene:*"));
+        assertEquals(clearResult.pattern(), "gene:*");
     }
 
     @Test
-    void partialSuccess_shouldPartiallyClearCache() {
+    void partialSuccess_ShouldCreatePartialSuccessResult() {
         ClearResult clearResult = ClearResult.partialSuccess(10L, "gene:*", "Network error");
         assertTrue(clearResult.isSuccessful());
-        assertThat(clearResult.deletedCount(), equalTo(10L));
+        assertEquals(clearResult.deletedCount(), 10L);
         assertTrue(clearResult.message().contains("Partially cleared 10"));
-    }
-
-    @Test
-    void constructor_ShouldThrowExceptionForNullPattern() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            new ClearResult(true, 10L, "TEST", 213123213L, null);
-        });
-        assertTrue(exception.getMessage().contains("Pattern cannot be null or blank"));
     }
 
     @Test

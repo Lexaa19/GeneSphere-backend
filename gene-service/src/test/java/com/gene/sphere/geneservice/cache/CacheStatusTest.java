@@ -1,9 +1,6 @@
 package com.gene.sphere.geneservice.cache;
 
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -29,16 +26,16 @@ class CacheStatusTest {
     }
 
     @Test
-    void empty_ShouldClearCacheStatus() {
+    void empty_ShouldReturnUnavailableWithZeroCounts() {
         long before = System.currentTimeMillis();
         CacheStatus status = CacheStatus.empty();
         long after = System.currentTimeMillis();
         long ts = status.timestamp();
 
         assertTrue(ts >= before && ts <= after);
-        assertThat(status.totalKeys(), equalTo(0L));
-        assertThat(status.status(), equalTo("UNAVAILABLE"));
-        assertThat(status.geneKeys(), equalTo(0L));
+        assertEquals(status.totalKeys(), 0L);
+        assertEquals(status.status(), "UNAVAILABLE");
+        assertEquals(status.geneKeys(), 0L);
 
         String result = status.toString();
         assertTrue(result.contains("status=UNAVAILABLE"));
