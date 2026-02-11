@@ -43,7 +43,6 @@ public record CacheStatus(
      * @param mutationKeys the number of mutation-specific cache entries, must not be null
      * @param status       the current operational status of the cache, must not be null
      * @return a new CacheStats instance with current timestamp
-     * @throws NullPointerException if any parameter is null
      */
     public static CacheStatus of(Long totalKeys, Long geneKeys, Long mutationKeys, String status) {
         return new CacheStatus(totalKeys, geneKeys, mutationKeys, System.currentTimeMillis(), status);
