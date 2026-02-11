@@ -142,23 +142,6 @@ public record ClearResult(
     }
 
     /**
-     * Gets the deletion rate as a formatted percentage string.
-     *
-     * <p>This method is useful for monitoring and reporting purposes when
-     * you know the expected number of entries that should have been deleted.</p>
-     *
-     * @param expectedCount the expected number of entries to delete
-     * @return formatted percentage string (e.g., "75.5%")
-     */
-    public String getDeletionRate(long expectedCount) {
-        if (expectedCount <= 0) {
-            return "N/A";
-        }
-        double rate = (double) deletedCount / expectedCount * 100;
-        return String.format("%.1f%%", rate);
-    }
-
-    /**
      * Returns a human-readable string representation of the clear operation result.
      *
      * <p>The format includes success status, deletion count, pattern, and timestamp
