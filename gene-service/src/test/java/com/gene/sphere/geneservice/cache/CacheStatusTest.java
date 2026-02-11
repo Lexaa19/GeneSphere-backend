@@ -93,7 +93,7 @@ class CacheStatusTest {
     }
 
     @Test
-    void toString_ShouldContainAllFields() {
+    void toString_ShouldContainAllFields_WhenStatusIsAvailable() {
         // Arrange - use constructor with fixed values for predictable testing
         long fixedTimestamp = 1234567890L;
         CacheStatus status = new CacheStatus(100L, 80L, 20L, fixedTimestamp, "AVAILABLE");
