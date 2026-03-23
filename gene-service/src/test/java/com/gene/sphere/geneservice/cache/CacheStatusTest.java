@@ -69,7 +69,7 @@ class CacheStatusTest {
     }
 
     @Test
-    void areDtosEqual_shouldReturnTrue() {
+    void equals_ShouldReturnTrue_WhenRecordsHaveSameValues() {
         long fixedTimestamp = 1234567890L;
         CacheStatus status = new CacheStatus(100L, 80L, 20L, fixedTimestamp, "UNKNOWN");
         CacheStatus secondStatus = new CacheStatus(100L, 80L, 20L, fixedTimestamp, "UNKNOWN");
