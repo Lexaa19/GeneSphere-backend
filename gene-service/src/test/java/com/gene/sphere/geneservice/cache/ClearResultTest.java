@@ -86,7 +86,7 @@ class ClearResultTest {
     }
 
     @Test
-    void constructor_ShouldThrowExceptionForZeroTimestamp() {
+    void constructor_ShouldThrowException_WhenTimestampIsZero() {
         long timestamp = 0L;
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             new ClearResult(true, 10L, "TEST", timestamp, "gene:*");
