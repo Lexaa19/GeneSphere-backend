@@ -78,7 +78,7 @@ class ClearResultTest {
     }
 
     @Test
-    void constructor_ShouldThrowExceptionForBlankPattern() {
+    void constructor_ShouldThrowException_WhenPatternIsBlank() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             new ClearResult(true, 10L, "TEST", 213123213L, "");
         });
