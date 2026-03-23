@@ -17,7 +17,7 @@ class CacheStatusTest {
     }
 
     @Test
-    void of_ShouldSetTimestampAutomatically() {
+    void of_ShouldSetTimestampAutomatically_WhenCreatingStatus() {
         long before = System.currentTimeMillis();
         CacheStatus status = CacheStatus.of(100L, 80L, 20L, "AVAILABLE");
         long after = System.currentTimeMillis();
