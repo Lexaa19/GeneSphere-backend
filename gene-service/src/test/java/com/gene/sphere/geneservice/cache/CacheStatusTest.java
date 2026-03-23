@@ -84,7 +84,7 @@ class CacheStatusTest {
     }
 
     @Test
-    void areDtosHashesAreEqual_shouldReturnTrue() {
+    void hashCode_ShouldBeEqual_WhenRecordsHaveSameValues() {
         // if a fixed time stamp is not added, the hash will fail as it takes different times (even milliseconds apart count)
         long fixedTimestamp = 1234567890L;
         CacheStatus status = new CacheStatus(100L, 80L, 20L, fixedTimestamp, "UNKNOWN");
