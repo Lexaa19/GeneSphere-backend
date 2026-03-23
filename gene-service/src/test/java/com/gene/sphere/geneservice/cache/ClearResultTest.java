@@ -21,7 +21,7 @@ class ClearResultTest {
         ClearResult success = ClearResult.success(0L, "gene*");
         assertTrue(success.isSuccessful());
         assertEquals(success.deletedCount(), 0L);
-        assertEquals(success.message(),"No cache entries found matching pattern 'gene*'");
+        assertEquals(success.message(), "No cache entries found matching pattern 'gene*'");
     }
 
     @Test
