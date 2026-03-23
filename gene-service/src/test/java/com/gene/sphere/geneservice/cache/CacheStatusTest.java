@@ -63,7 +63,7 @@ class CacheStatusTest {
     }
 
     @Test
-    void isCacheAvailable_shouldReturnFalse_UnknownState() {
+    void isAvailable_ShouldReturnFalse_WhenStatusIsUnknown() {
         CacheStatus status = CacheStatus.of(100L, 80L, 20L, "UNKNOWN");
         assertFalse(status.isAvailable());
     }
