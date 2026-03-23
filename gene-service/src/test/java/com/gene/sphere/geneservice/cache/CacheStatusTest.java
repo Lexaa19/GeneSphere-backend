@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CacheStatusTest {
 
     @Test
-    void constructor_ShouldCreateCacheStatusWithProvidedValues() {
+    void constructor_ShouldCreateCacheStatus_WithProvidedValues() {
         long fixedTimeStamp = 1234567890L;
         CacheStatus status = new CacheStatus(100L, 80L, 20L, fixedTimeStamp, "AVAILABLE");
 
