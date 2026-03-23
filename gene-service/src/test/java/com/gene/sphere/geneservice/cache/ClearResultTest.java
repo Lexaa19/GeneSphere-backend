@@ -17,7 +17,7 @@ class ClearResultTest {
     }
 
     @Test
-    void success_ShouldCreateSuccessfulResultWithZeroDeletions() {
+    void success_ShouldCreateSuccessfulResult_WhenZeroDeletions() {
         ClearResult success = ClearResult.success(0L, "gene*");
         assertTrue(success.isSuccessful());
         assertEquals(success.deletedCount(), 0L);
