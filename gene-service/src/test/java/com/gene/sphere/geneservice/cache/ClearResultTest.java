@@ -70,7 +70,7 @@ class ClearResultTest {
     }
 
     @Test
-    void constructor_ShouldThrowExceptionForBlankMessage() {
+    void constructor_ShouldThrowException_WhenMessageIsBlank() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             new ClearResult(true, 10L, "  ", 213123213L, "gene*");
         });
