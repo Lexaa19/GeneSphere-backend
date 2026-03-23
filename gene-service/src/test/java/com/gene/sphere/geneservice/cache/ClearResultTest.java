@@ -95,7 +95,7 @@ class ClearResultTest {
     }
 
     @Test
-    void hasDeletedEntries_ShouldReturnTrueWhenCountGreaterThanZero() {
+    void hasDeletedEntries_ShouldReturnTrue_WhenCountIsGreaterThanZero() {
         long deletedCount = 10L;
         ClearResult result = new ClearResult(true, deletedCount, "TEST", 213123213L, "gene:*");
         assertTrue(result.hasDeletedEntries());
