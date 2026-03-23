@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ClearResultTest {
 
     @Test
-    void success_ShouldCreateSuccessfulResultWithDeletions() {
+    void success_ShouldCreateSuccessfulResult_WhenDeletionsOccur() {
         ClearResult success = ClearResult.success(150L, "gene*");
         assertTrue(success.isSuccessful());
         assertEquals(success.deletedCount(), 150L);
