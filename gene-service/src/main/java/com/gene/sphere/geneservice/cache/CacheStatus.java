@@ -41,9 +41,10 @@ public record CacheStatus(
      * @param totalKeys    the total number of keys currently in Redis cache, must not be null
      * @param geneKeys     the number of gene-specific cache entries, must not be null
      * @param mutationKeys the number of mutation-specific cache entries, must not be null
-     * @param status       the current operational status of the cache, must not be null
+     * @param status       the current operational status of the cache (e.g. "AVAILABLE", "UNAVAILABLE"); may be
+     *                     {@code null}, in which case {@link #isAvailable()} will return {@code false} and
+     *                     {@link #toString()} will render the status as {@code "null"}
      * @return a new CacheStats instance with current timestamp
-     * @throws NullPointerException if any parameter is null
      */
     public static CacheStatus of(Long totalKeys, Long geneKeys, Long mutationKeys, String status) {
         return new CacheStatus(totalKeys, geneKeys, mutationKeys, System.currentTimeMillis(), status);
