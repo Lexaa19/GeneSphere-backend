@@ -77,7 +77,7 @@ class CacheStatusTest {
     }
 
     @Test
-    void recordsWithDifferentValues_ShouldNotBeEqual() {
+    void equals_ShouldReturnFalse_WhenRecordsHaveDifferentValues() {
         CacheStatus status = CacheStatus.of(100L, 80L, 20L, "AVAILABLE");
         CacheStatus secondStatus = CacheStatus.of(100L, 180L, 120L, "AVAILABLE");
         assertNotEquals(status, secondStatus);
