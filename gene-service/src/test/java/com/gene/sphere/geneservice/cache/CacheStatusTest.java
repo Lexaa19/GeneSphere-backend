@@ -57,7 +57,7 @@ class CacheStatusTest {
     }
 
     @Test
-    void isCacheAvailable_shouldReturnFalse_NullState() {
+    void isAvailable_ShouldReturnFalse_WhenStatusIsNull() {
         CacheStatus status = CacheStatus.of(100L, 80L, 20L, null);
         assertFalse(status.isAvailable());
     }
