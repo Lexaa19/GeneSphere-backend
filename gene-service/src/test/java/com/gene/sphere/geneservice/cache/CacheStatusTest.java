@@ -26,7 +26,7 @@ class CacheStatusTest {
     }
 
     @Test
-    void empty_ShouldReturnUnavailableWithZeroCounts() {
+    void empty_ShouldReturnUnavailableStatus_WhenCountsAreZero() {
         long before = System.currentTimeMillis();
         CacheStatus status = CacheStatus.empty();
         long after = System.currentTimeMillis();
