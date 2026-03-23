@@ -25,7 +25,7 @@ class ClearResultTest {
     }
 
     @Test
-    void failure_ShouldCreateFailedResult() {
+    void failure_ShouldCreateFailedResult_WhenErrorOccurs() {
         ClearResult clearResult = ClearResult.failure("gene:*", "Connection timeout");
         assertFalse(clearResult.isSuccessful());
         assertEquals(clearResult.deletedCount(), 0L);
