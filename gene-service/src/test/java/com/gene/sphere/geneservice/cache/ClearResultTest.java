@@ -36,7 +36,7 @@ class ClearResultTest {
     }
 
     @Test
-    void partialSuccess_ShouldCreatePartialSuccessResult() {
+    void partialSuccess_ShouldCreatePartialSuccessResult_WhenPartiallyCleared() {
         ClearResult clearResult = ClearResult.partialSuccess(10L, "gene:*", "Network error");
         assertTrue(clearResult.isSuccessful());
         assertEquals(clearResult.deletedCount(), 10L);
